@@ -68,15 +68,13 @@ end
 %dicomwrite cannot handle single, so use signed int16
 %this will pose an issue with data that has a small range however. 
 %can use a scalingfactor, but how to determine? 
+imagevolume=(abs(imagevolume));
+imagevolume=3276.7 * (imagevolume/max(imagevolume(:)));
 scalingfactor=10;
 imagevolume = int16(imagevolume * scalingfactor);
 
 %dimensions volume
 [nX,nY,nZ,nDyns,nCard,nEcho,nLoc,nMix,nEx1,nEx2,nAve] = size(imagevolume);
-
-% Scale data
-imagevolume=single(abs(imagevolume));
-imagevolume=3276.7 * imagevolume/max(imagevolume(:));
 
 %% Set the tags
 %Machine
