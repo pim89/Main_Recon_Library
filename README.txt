@@ -15,7 +15,9 @@ Data format:
 Tested and supported features:
 	Read lab/raw data from reconframe
 	Read par/rec data from reconframe
-	Extract PPE parameters from reconframe
+	Extract PPE parameters from reconframe --> Template?
+	Radial trajectory and density functions work now
 TODO:
 	Integrate NUFFT code from FlatIron https://github.com/dfm/finufft/tree/master/matlab
+	BART radial trajectory and tiny golden angle
 

@@ -1,6 +1,0 @@
-function kspace_data = reader_reconframe_lab_raw(loc)
-%% Read lab/raw data using reconframe an
-MR=MRecon(loc);
-
-
-end
