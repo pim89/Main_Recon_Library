@@ -75,7 +75,7 @@ imagevolume = int16(imagevolume * scalingfactor);
 [nX,nY,nZ,nDyns,nCard,nEcho,nLoc,nMix,nEx1,nEx2,nAve] = size(imagevolume);
 
 % Scale data
-imagevolume=(abs(imagevolume));
+imagevolume=single(abs(imagevolume));
 imagevolume=3276.7 * imagevolume/max(imagevolume(:));
 
 %% Set the tags

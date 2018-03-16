@@ -18,8 +18,8 @@ writeDicomFromMRecon(MR,MR.Data,'../Modular_Recon_Library/');
 
 %% Golden angle radial 3D reconstruction
 % Radial k-space trajectory (\./ not \../)
-[~,MR]=reader_reconframe_lab_raw('/local_scratch/tbruijne/WorkingData/4DGA/Scan2/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
+[~,MR]=reader_reconframe_lab_raw('/local_scratch/tbruijne/WorkingData/4DGA/Scan2/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Trajectory & density
@@ -27,18 +27,4 @@ traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
 dcf=radial_density(traj);
 
 % FFT in z
-MR.Data=ifft(MR.Data,[],3);
 
-% Radial phase correction
-radial_phase_correction_zero(MR.Data);
-
-% Initialize nufft operator
-F=FG2D(traj,[kdim(1:2) 1]);
-
-for z=1:size(MR.Data,3)
-    for c=1:size(MR.Data,4)
-        A(:,:,z,c)=F'*(MR.Data(:,:,z,c).*dcf);
-        c
-        z
-    end    
-end
