@@ -13,10 +13,10 @@ kdata=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexp
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Write data to dicom
-MR.Perform;
-writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
+%MR.Perform;
+%writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
 
-%% NUFFT toolboxes used with a 3D goldenangle dataset
+%% NUFFT toolboxes
 % Radial k-space trajectory (\./ not \../)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
@@ -39,7 +39,6 @@ F2D=FG2D(traj,[kdim(1:2) 1]);
 for z=1:size(MR.Data,3)
     for c=1:1%size(MR.Data,4)
         Fessler2D(:,:,z,c)=F2D'*(MR.Data(:,:,z,c).*dcf);
-        disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
     end    
 end
 close all;figure,imshow3(abs(Fessler2D(:,:,5:28,1)),[],[4 6])
@@ -51,7 +50,6 @@ G2D=GG2D(traj,[kdim(1:2) 1]);
 for z=1:size(MR.Data,3)
     for c=1:1%size(MR.Data,4)
         Greengard2D(:,:,z,c)=G2D'*(MR.Data(:,:,z,c).*dcf);
-        disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
     end    
 end
 figure,imshow3(abs(Greengard2D(:,:,5:28,1)),[],[4 6])
@@ -94,15 +92,13 @@ F2D=FG2D(traj,[kdim(1:2) 1]);
 for z=1:size(MR.Data,3)
     for c=1:size(MR.Data,4)
         Fessler2D_LR(:,:,z,c)=F2D'*(MR.Data(:,:,z,c).*dcf.*mask);
-        disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_LR(:,:,5:28,1)),[],[4 6])
 
 % Openadapt 2D
 for z=1:size(MR.Data,3)
-    CSM_opd_2D(:,:,:,z)=openadapt(Fessler2D_LR(:,:,z,:));
-    disp(['Z = ',num2str(z)])
+    CSM_opd_2D(:,:,z,:)=openadapt(Fessler2D_LR(:,:,z,:));
 end
 figure,imshow3(abs(CSM_opd_2D(:,:,15,:)),[],[2 6])
 
@@ -116,7 +112,7 @@ for z=15:15%1:size(MR.Data,3)
 end
 
 %% Iterative density estimation code (only 3D)
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
@@ -148,7 +144,6 @@ F2D=FG2D(traj,[kdim(1:2) 1]);
 for z=1:size(kspace_data,3)
     for c=1:size(kspace_data,4)
         Fessler2D_SW(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf.*repmat(soft_weights,[kdim(1) 1]));
-        disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
@@ -174,3 +169,5 @@ kdim=size(kspace_data);
 F2D=FG2D(traj,kdim);
 Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
+
+%%

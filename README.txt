@@ -21,6 +21,8 @@ Tested and supported features:
     	Openadapt and espirit matlab implementations work now
     	Option to load k-space data from directory if it was saved
 	Iterative density estimation code works for 3D
+	Respiratory motion estimation from multi-channel data (coil clustering)
+	Respiratory phases binning and transformation of matrices
 
 
 TODO:
