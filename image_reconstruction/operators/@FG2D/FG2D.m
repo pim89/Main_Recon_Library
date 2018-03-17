@@ -14,20 +14,20 @@ end
 fg.parfor=0;
 
 % Image space dimensions
-fg.Id(1:2)=2*ceil(max(abs(k(1,:))));
-fg.Id(3)=2*ceil(max(abs(k(3,:))));
-if fg.Id(3)==0; fg.Id(3)=1;end
-fg.Id=[fg.Id kdim(4:end)];
+fg.idim(1:2)=ceil(max(abs(k(1,:))));
+fg.idim(3)=ceil(max(abs(k(3,:))));
+if fg.idim(3)==0; fg.idim(3)=1;end
+fg.idim=[fg.idim kdim(4:end)];
 
 % K-space dimensions
-fg.Kd=kdim;
+fg.kdim=kdim;
 
 % Mix the readouts and samples in advance
 fg.k=reshape(k,[3 kdim(1)*kdim(2) 1 1 1 kdim(5:12)]);clear k 
 
 % Input for nufft_init
 Jd=[4,4];     % Kernel width of convolution
-Nd=fg.Id(1:2);
+Nd=fg.idim(1:2);
 Gd=[Nd*1];    % Overgridding ratio
 n_shift=Nd/2;
 

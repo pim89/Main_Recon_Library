@@ -6,8 +6,8 @@ function res = mtimes(fg,data)
 % Tom Bruijnen - University Medical Center Utrecht - 201704      
     
 % Check what dimensions require new trajectory coordinates
-idim=fg.Id;
-kdim=fg.Kd;
+idim=fg.idim;
+kdim=fg.kdim;
 
 if fg.adjoint==1    % non-Cartesian k-space to Cartesian image domain || type 1
 
@@ -37,13 +37,13 @@ if fg.adjoint==1    % non-Cartesian k-space to Cartesian image domain || type 1
             for coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
                 res_tmp(:,coil)=matrix_to_vec(nufft_adj(data_tmp(:,:,coil),...
-                    fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.Id(1:2))));
+                    fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.idim(1:2))));
             end
         else
             parfor coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
                 res_tmp(:,coil)=matrix_to_vec(nufft_adj(data_tmp(:,:,coil),...
-                    fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.Id(1:2))));
+                    fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.idim(1:2))));
             end
         end
 
@@ -82,13 +82,13 @@ else         % Cartesian image domain to non-Cartesian k-space || type 2
                 for coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
                     res_tmp(:,coil)=matrix_to_vec(nufft(data_tmp(:,:,coil),...
-                        fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.Id(1:2))));
+                        fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.idim(1:2))));
                 end
             else
                 parfor coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
                     res_tmp(:,coil)=matrix_to_vec(nufft(data_tmp(:,:,coil),...
-                        fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.Id(1:2))));
+                        fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg})/sqrt(prod(fg.idim(1:2))));
                 end
             end
 

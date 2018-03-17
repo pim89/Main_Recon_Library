@@ -40,8 +40,10 @@ else
     rad_ang=0:d_ang:d_ang*(kdim(2)-1);
     
     % Line reversal for uniform
-    rad_ang(2:2:end)=rad_ang(2:2:end)+pi;
-    rad_ang=mod(rad_ang,2*pi);
+    if goldenangle == 0
+        rad_ang(2:2:end)=rad_ang(2:2:end)+pi;
+        rad_ang=mod(rad_ang,2*pi);
+    end
     
     % Calculate samples for single spoke
     kx=linspace(0,kdim(1)-1,kdim(1)+1)'-(kdim(1)-1)/2;kx(end)=[];

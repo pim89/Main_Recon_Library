@@ -1,2 +1,0 @@
-MRecon: Version 3.0.552
-(c) 2010, GyroTools LLC

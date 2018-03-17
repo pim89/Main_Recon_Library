@@ -4,7 +4,7 @@
 curdir=pwd;
 suc6=1;
 
-if ~strcmpi(curdir(end-20:end),'Modular_Recon_Library')
+if ~strcmpi(curdir(end-17:end),'Main_Recon_Library')
     disp('Warning: Current directory is not set appropriately, should be /Modular_Recon_Library/');suc6=0;
 end
 
@@ -26,6 +26,11 @@ end
 % Check if Reconframe is added to the path
 if isempty(which('MRecon'))
     disp('Warning: Reconframe is not added to the path');suc6=0;
+end
+
+% Check if iterative DCF code is added to the path
+if isempty(which('sdc3_MAT'))
+    disp('Warning: Iterative DCF code is not added to the path');suc6=0;
 end
 
 % Succesfull integration

@@ -18,6 +18,8 @@ Tested and supported features:
 	Extract PPE parameters from reconframe --> Template?
 	Radial trajectory and density functions work now
 	Radial phase corrections works now
+    Openadapt and espirit matlab implementations work now
+    Option to load k-space data from directory if it was saved
 TODO:
 	Integrate NUFFT code from FlatIron https://github.com/dfm/finufft/tree/master/matlab
 	BART radial trajectory add tiny golden angle
