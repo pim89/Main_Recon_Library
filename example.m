@@ -130,3 +130,11 @@ for c=1:1%size(MR.Data,4)
     Fessler3D(:,:,:,c)=F3D'*(kspace_data(:,:,:,c).*dcf);
 end
 
+%% Estimate respiratory signal from multi-channel k-space data
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+radial_phase_correction_zero(kspace_data);
+MR.Data=ifft(kspace_data,[],3);
+respiration=radial_3D_estimate_motion(kspace_data);

@@ -16,7 +16,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 MR.Perform;
 writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
 
-%% Golden angle radial 3D reconstruction
+%% NUFFT toolboxes used with a 3D goldenangle dataset
 % Radial k-space trajectory (\./ not \../)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
@@ -78,7 +78,7 @@ for c=1:1%size(MR.Data,4)
 end
 figure,imshow3(abs(Greengard3D(:,:,5:28,1)),[],[4 6])
 
-%% Coil sensitivity map estimation 
+%% Coil sensitivity map estimation (espirit and openadapt)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
@@ -92,16 +92,47 @@ lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,[kdim(1:2) 1]);
 for z=1:size(MR.Data,3)
-    for c=1:1%size(MR.Data,4)
+    for c=1:size(MR.Data,4)
         Fessler2D_LR(:,:,z,c)=F2D'*(MR.Data(:,:,z,c).*dcf.*mask);
         disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_LR(:,:,5:28,1)),[],[4 6])
 
-% Openadapt
+% Openadapt 2D
 for z=1:size(MR.Data,3)
-    CSM_opd(:,:,:,z)=openadapt(permute(Fessler2D_LR(:,:,z,:),[4 1 2 3]));
+    [~,CSM_opd_2D(:,:,:,z)]=openadapt(permute(Fessler2D_LR(:,:,z,:),[4 1 2 3]));
     disp(['Z = ',num2str(z)])
 end
-figure,imshow3(abs(CSM_opd(:,:,:,:)),[],[4 6])
+CSM_opd_2D=permute(CSM_opd_2D,[2 3 4 1]);
+figure,imshow3(abs(CSM_opd_2D(:,:,15,:)),[],[2 6])
+
+% Openadapt 3D
+[~,CSM_opd_3D]=openadapt(permute(Fessler2D_LR,[4 1 2 3]));
+CSM_opd_3D=permute(CSM_opd_3D,[2 3 4 1]);
+figure,imshow3(abs(CSM_opd_3D(:,:,15,:)),[],[2 6])
+
+% ESPIRiT 2D (either matlab-based (slow) or bart-based (fast)
+for z=15:15%1:size(MR.Data,3)
+    csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:));
+end
+
+%% Iterative density estimation code (only 3D)
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:3),1);
+dcf=iterative_dcf_estimation(traj);
+radial_phase_correction_zero(kspace_data);
+
+% Initialize Fessler 3D nufft operator
+F3D=FG3D(traj,[kdim(1:3) 1]);
+for c=1:1%size(MR.Data,4)
+    Fessler3D(:,:,:,c)=F3D'*(kspace_data(:,:,:,c).*dcf);
+end
+
+%% Estimate respiratory signal from multi-channel k-space data
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
+dcf=radial_density(traj);
+radial_phase_correction_zero(MR.Data);
+MR.Data=ifft(MR.Data,[],3);

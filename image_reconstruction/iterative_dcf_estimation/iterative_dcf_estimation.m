@@ -19,8 +19,6 @@ else
     n_iter=5;
 end
 
-
-
 % Image space dimensions
 idim(1:2)=ceil(max(abs(traj(1,:))));
 idim(3)=round(2*max(abs(traj(3,:))));
