@@ -16,7 +16,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 MR.Perform;
 writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
 
-%% Golden angle radial 3D reconstruction
+%% NUFFT toolboxes used with a 3D goldenangle dataset
 % Radial k-space trajectory (\./ not \../)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
@@ -78,7 +78,7 @@ for c=1:1%size(MR.Data,4)
 end
 figure,imshow3(abs(Greengard3D(:,:,5:28,1)),[],[4 6])
 
-%% Coil sensitivity map estimation 
+%% Coil sensitivity map estimation (espirit and openadapt)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
@@ -117,9 +117,16 @@ for z=15:15%1:size(MR.Data,3)
     csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:));
 end
 
-%% Iterative density estimation code
-[~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
-kdim=size(MR.Data);
-ppe_pars=reader_reconframe_ppe_pars(MR);
-traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
+%% Iterative density estimation code (only 3D)
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
+radial_phase_correction_zero(kspace_data);
+
+% Initialize Fessler 3D nufft operator
+F3D=FG3D(traj,[kdim(1:3) 1]);
+for c=1:1%size(MR.Data,4)
+    Fessler3D(:,:,:,c)=F3D'*(kspace_data(:,:,:,c).*dcf);
+end
+
