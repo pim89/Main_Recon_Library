@@ -7,7 +7,7 @@ function dcf = iterative_dcf_estimation(traj,varargin)
 % Check input
 kdim=size(traj);
 if numel(kdim)<4
-    disp('Iterative DCF code does not support 2D trajectories at the moment.')
+    disp('>> Iterative DCF code does not support 2D trajectories at the moment.')
     dcf=[];
     return
 end

@@ -17,7 +17,7 @@ end
 if numel(varargin)>1
     if exist([curdir,'kspace_data.mat']) > 0
         load([curdir,'kspace_data.mat']);
-        disp(['Loaded K-space data from ',curdir,'kspace_data.mat',' ,but MR object not assigned'])
+        disp(['>> Loaded K-space data from ',curdir,'kspace_data.mat',' ,but MR object not assigned'])
         MR=[];
         return;
     end

@@ -98,18 +98,18 @@ for z=1:size(MR.Data,3)
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_LR(:,:,5:28,1)),[],[4 6])
+csm=openadapt(Fessler2D_LR);
+
 
 % Openadapt 2D
 for z=1:size(MR.Data,3)
-    [~,CSM_opd_2D(:,:,:,z)]=openadapt(permute(Fessler2D_LR(:,:,z,:),[4 1 2 3]));
+    CSM_opd_2D(:,:,:,z)=openadapt(Fessler2D_LR(:,:,z,:));
     disp(['Z = ',num2str(z)])
 end
-CSM_opd_2D=permute(CSM_opd_2D,[2 3 4 1]);
 figure,imshow3(abs(CSM_opd_2D(:,:,15,:)),[],[2 6])
 
 % Openadapt 3D
-[~,CSM_opd_3D]=openadapt(permute(Fessler2D_LR,[4 1 2 3]));
-CSM_opd_3D=permute(CSM_opd_3D,[2 3 4 1]);
+CSM_opd_3D=openadapt(Fessler2D_LR);
 figure,imshow3(abs(CSM_opd_3D(:,:,15,:)),[],[2 6])
 
 % ESPIRiT 2D (either matlab-based (slow) or bart-based (fast)
@@ -130,7 +130,7 @@ for c=1:1%size(MR.Data,4)
     Fessler3D(:,:,:,c)=F3D'*(kspace_data(:,:,:,c).*dcf);
 end
 
-%% Estimate respiratory signal from multi-channel k-space data
+%% Estimate respiratory signal from multi-channel k-space data + motion weighted reconstruction
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -138,3 +138,5 @@ dcf=radial_density(traj);
 radial_phase_correction_zero(kspace_data);
 MR.Data=ifft(kspace_data,[],3);
 respiration=radial_3D_estimate_motion(kspace_data);
+soft_weights=mrriddle_respiratory_filter(respiration,140);
+

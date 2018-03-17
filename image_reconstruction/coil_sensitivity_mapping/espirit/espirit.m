@@ -15,7 +15,7 @@ if isbart
     csm=bart('ecalib -t 0.0001 -m1',kimg); 
 else
     if numel(size(squeeze(img)))>3
-        disp('3D ESPIRiT is not supported in the matlab implementation.');
+        disp('>> 3D ESPIRiT is not supported in the matlab implementation.');
         return;
     end
     % Algorithm settings
