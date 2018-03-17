@@ -23,7 +23,7 @@ function ph = calc_phase(peaks)
    %%% positive and negative peaks (assumes strict alternation!)
    plocm=find(peaks<-0.5);
    if (abs(length(plocm)-length(ploc))>1)
-     disp('ERROR - positive and negative peak numbers too dissimilar');
+     disp('>>ERROR - positive and negative peak numbers too dissimilar');
    end
    % do beginning part (up to first positive peak)
    if (plocm(1)<ploc(1))

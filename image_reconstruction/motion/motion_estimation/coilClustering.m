@@ -15,7 +15,7 @@ function [dave, coilID] = coilClustering(d1, thresh)
 [nviews, nc] = size(d1);
 
 % find out the covariance matrix between coils
-disp('Calculating covariance matrix...');
+%disp('Calculating covariance matrix...');
 corrm = zeros(nc,nc);
 
 for i = 1 : nc
@@ -25,7 +25,7 @@ for i = 1 : nc
 	end
 end
 
-disp('Spectral clustering...');
+%disp('Spectral clustering...');
 % set a mask according to this value
 mask = zeros(nc,nc);
 mask(abs(corrm)>thresh) = 1;
@@ -44,7 +44,7 @@ subindex = find(subgroup==1);
 coilID = subgroup;
 
 if( sum(subgroup) < 2)
-    disp('Clustering failed, only one coil was selected...');
+    disp('>>Clustering failed, only one coil was selected...');
 end
 
 for c = 1:nc

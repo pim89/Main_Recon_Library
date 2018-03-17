@@ -26,16 +26,16 @@ if nargin < 3
 else 
   x = x(:);
   if length(v)~= length(x)
-    error('Input vectors v and x must have same length');
+    error('>>Input vectors v and x must have same length');
   end
 end
   
 if (length(delta(:)))>1
-  error('Input argument DELTA must be a scalar');
+  error('>>Input argument DELTA must be a scalar');
 end
 
 if delta <= 0
-  error('Input argument DELTA must be positive');
+  error('>>Input argument DELTA must be positive');
 end
 
 mn = Inf; mx = -Inf;

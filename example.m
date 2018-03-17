@@ -98,8 +98,6 @@ for z=1:size(MR.Data,3)
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_LR(:,:,5:28,1)),[],[4 6])
-csm=openadapt(Fessler2D_LR);
-
 
 % Openadapt 2D
 for z=1:size(MR.Data,3)
@@ -135,8 +133,44 @@ end
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
 radial_phase_correction_zero(kspace_data);
-MR.Data=ifft(kspace_data,[],3);
-respiration=radial_3D_estimate_motion(kspace_data);
-soft_weights=mrriddle_respiratory_filter(respiration,140);
 
+% Estimation respiratory motion signal from multichannel data
+respiration=radial_3D_estimate_motion(kspace_data);
+
+% Get soft-weights
+recon_matrix_size=round(max(traj(:)));
+soft_weights=mrriddle_respiratory_filter(respiration,recon_matrix_size);
+
+% Apply motion-weighted reconstruction
+F2D=FG2D(traj,[kdim(1:2) 1]);
+for z=1:size(kspace_data,3)
+    for c=1:size(kspace_data,4)
+        Fessler2D_SW(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf.*repmat(soft_weights,[kdim(1) 1]));
+        disp(['Coil / Z = ',num2str(c),' ',num2str(z)])
+    end    
+end
+close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
+
+%% 4D (x,y,z,resp) reconstruction
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+radial_phase_correction_zero(kspace_data);
+respiration=radial_3D_estimate_motion(kspace_data);
+
+% Define number of phases and do phase-binning
+n_phases=4;
+respiratory_bin_idx=respiratory_binning(respiration,n_phases);
+
+% Use the binning to transform the data matrices
+[kspace_data,traj,dcf]=respiratory_data_transform(kspace_data,traj,dcf,respiratory_bin_idx,n_phases);
+
+% Fourier transform on new matrices
+kdim=size(kspace_data);
+F2D=FG2D(traj,kdim);
+Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+slicer(squeeze(Recon_4D(:,:,19,:,:)))

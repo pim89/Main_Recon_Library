@@ -4,7 +4,7 @@ function c2 = optimize_sgw(d,M,c1)
 % d = list of respiratory distances
 
 % Exhaustive search
-sgw=0:.001:5;
+sgw=0:.01:50;
 
 for n=1:numel(sgw)
     score(:,n)=exp(-sgw(n).*(abs(d)-c1));
@@ -16,5 +16,4 @@ score=abs(M*pi/2-sum(score,1));
 c2=sgw(minpos);
 
 % END
-
 end

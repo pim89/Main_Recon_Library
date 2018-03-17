@@ -8,29 +8,29 @@ function [index] = sort_data_4D(par)
 %                   'hybrid'
 
 if ~any(strcmp('sort_data',fieldnames(par)))
-    fprintf('No sorting mechanism found, using amplitude binning ... \n');
+    fprintf('>>No sorting mechanism found, using amplitude binning ... \n');
     par.sort_data = 'amplitude';
 end;
 
 if strcmpi('amplitude',par.sort_data);
-    fprintf('Performing amplitude binning \n');
+    %fprintf('Performing amplitude binning \n');
     [~,index] = sort(par.respiration,'descend');
 %     k = traj(:,index,:);
 %     w = dcf(:,index);
 %     kdata_sort = kdata(:,index,:,:);
 elseif strcmpi('phase',par.sort_data);
-    fprintf('Performing phase binning \n');
+    %fprintf('Performing phase binning \n');
     [maxtab,mintab] = peakdet(par.respiration,0.1);
-    plot(par.respiration); hold on;
-    plot(maxtab(:,1),maxtab(:,2),'.','MarkerSize',20);
-    plot(mintab(:,1),mintab(:,2),'.','MarkerSize',20);
-    hold off;
-    title('Peak detection');
+    %plot(par.respiration); hold on;
+    %plot(maxtab(:,1),maxtab(:,2),'.','MarkerSize',20);
+    %plot(mintab(:,1),mintab(:,2),'.','MarkerSize',20);
+    %hold off;
+    %title('Peak detection');
     peaks = zeros(length(par.respiration),1);
     peaks(maxtab(:,1)) = 1;
     peaks(mintab(:,1)) = -1;
     phase = calc_phase(peaks);
-    figure; plot( phase,'*-')
+    %figure; plot( phase,'*-')
     [~,index] = sort(phase,'descend'); 
     % Sort it
 %     k = traj(:,index,:);
@@ -39,16 +39,16 @@ elseif strcmpi('phase',par.sort_data);
 elseif strcmpi('hybrid',par.sort_data);
     fprintf('Performing hybrid binning \n');
     [maxtab,mintab] = peakdet(par.respiration,0.05);
-    plot(par.respiration); hold on;
-    plot(maxtab(:,1),maxtab(:,2),'.','MarkerSize',20);
-    plot(mintab(:,1),mintab(:,2),'.','MarkerSize',20);
-    hold off;
-    title('Peak detection');
+    %plot(par.respiration); hold on;
+    %plot(maxtab(:,1),maxtab(:,2),'.','MarkerSize',20);
+    %plot(mintab(:,1),mintab(:,2),'.','MarkerSize',20);
+    %hold off;
+    %title('Peak detection');
     peaks = zeros(length(par.respiration),1);
     peaks(maxtab(:,1)) = 1;
     peaks(mintab(:,1)) = -1;
     phase = calc_phase(peaks);
-    figure; plot( phase,'*-')
+    %figure; plot( phase,'*-')
     
     inexhale = zeros(length(phase),1);
     for npa = 1:length(phase);
@@ -82,5 +82,5 @@ elseif strcmpi('hybrid',par.sort_data);
     index = [real_in_index,real_ex_index];
     
 else
-    error('Wrong input for par.sort_data \n');
+    error('>>Wrong input for par.sort_data \n');
 end;
