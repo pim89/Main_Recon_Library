@@ -214,7 +214,7 @@ for z=1:size(kspace_data,3)
 end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
-%% Iterative sense least squares 
+%% Iterative sense least squares (L2+TV) -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
 [noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
@@ -231,20 +231,20 @@ F2D=FG2D(traj,kdim);
 lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 csm=openadapt(lowres);
 
-S=SS(csm);
-% Loop over z and initialize operator
+%Initialize structure to send to the solver
+par.kdim=c12d([kdim(1:2) 1 kdim(4)]);
+par.idim=idim_from_trajectory(traj,par.kdim);
+par.Niter=5;
+par.N=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
+par.W=DCF(sqrt(dcf));
+par.TV=TV_sparse(par.idim,[1 1 0 0 0],[1 1 0 0 0]);
+
+% Loop over slices and do itSense
 for z=1:size(kspace_data,3)
-    par.S=SS(csm(:,:,z,:));
-    par.N=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
-    par.kdim=[kdim(1:2) 1 kdim(4)];
-    par.D
+    par.y=par.DCF*kspace_data(:,:,z,:,:,:,:,:,:,:,:);
+    par.S=SS(csm(:,:,z,:));  
+    [itsense(:,:,z),~]=configure_regularized_iterative_sense(par);    
+    z
 end
 
-% %TV
-% NUFFT
-% S
-% DCF
-% kdim
-% idim
-% kspace data
-% Niter
+

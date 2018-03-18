@@ -17,7 +17,7 @@ if strcmp(transp_flag,'transp') % Nonuniform k-space uncombined --> uniform imag
     res=params.S*res;
     
     % Matrix to vector
-    res=matrix_to_vec(res{1})+complex(D);
+    res=matrix_to_vec(res)+complex(D);
     
 elseif strcmp(transp_flag,'notransp') % uniform image combined --> nonuniform k-space uncombined
     
@@ -34,7 +34,7 @@ elseif strcmp(transp_flag,'notransp') % uniform image combined --> nonuniform k-
     res=params.W*(params.N*x);
     
     % Vectorize
-    res=[matrix_to_vec(res{1}); complex(D)];    
+    res=[matrix_to_vec(res); complex(D)];    
    
 end
 
