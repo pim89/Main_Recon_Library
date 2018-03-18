@@ -24,6 +24,7 @@ Tested and supported features:
 	Respiratory motion estimation from multi-channel data (coil clustering)
 	Respiratory phases binning and transformation of matrices
 	Noise prewhitening included
+	Radial phase correction model-based
 
 
 TODO:

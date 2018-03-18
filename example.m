@@ -191,9 +191,25 @@ for z=1:size(kspace_data,3)
     end    
 end
 
+% Show difference
 normal=normal/mean(abs(normal(:)));
 prew=prew/mean(abs(prew(:)));
 A=zeros(140,140,12);
 A(:,:,1:6)=normal(:,:,10:2:20,1);
 A(:,:,7:12)=prew(:,:,10:2:20,1);
-figure,imshow3(abs(A),[0 10],[2 6])
+figure,imshow3(abs(A),[0 30],[2 6])
+
+%% Fitting radial phase correction
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_model(kspace_data,traj);
+F2D=FG2D(traj,[kdim(1:2) 1]);
+for z=1:size(kspace_data,3)
+    for c=1:1%size(kspace_data,4)
+        img(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf);
+    end    
+end
+close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
