@@ -30,7 +30,7 @@ dcf=radial_density(traj);
 MR.Data=ifft(MR.Data,[],3);
 
 % Radial phase correction
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Initialize Fessler 2D nufft operator
 F2D=FG2D(traj,[kdim(1:2) 1]);
@@ -60,7 +60,7 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:3),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
@@ -82,7 +82,7 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 MR.Data=ifft(MR.Data,[],3);
 
 % Create low-res images using a k-space mask
@@ -116,7 +116,7 @@ end
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
@@ -130,7 +130,7 @@ kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 
 % Estimation respiratory motion signal from multichannel data
 respiration=radial_3D_estimate_motion(kspace_data);
@@ -154,7 +154,7 @@ kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 respiration=radial_3D_estimate_motion(kspace_data);
 
 % Define number of phases and do phase-binning
@@ -170,4 +170,30 @@ F2D=FG2D(traj,kdim);
 Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
-%%
+%% Noise prewhitening 
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5);
+
+% Prewhitenen noise and do recons for both cases
+kspace_data_prew=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data_prew=ifft(kspace_data_prew,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data);
+kspace_data_prew=radial_phase_correction_zero(kspace_data_prew);
+F2D=FG2D(traj,[kdim(1:2) 1]);
+for z=1:size(kspace_data,3)
+    for c=1:1%size(kspace_data,4)
+        normal(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf);
+        prew(:,:,z,c)=F2D'*(kspace_data_prew(:,:,z,c).*dcf);
+    end    
+end
+
+normal=normal/mean(abs(normal(:)));
+prew=prew/mean(abs(prew(:)));
+A=zeros(140,140,12);
+A(:,:,1:6)=normal(:,:,10:2:20,1);
+A(:,:,7:12)=prew(:,:,10:2:20,1);
+figure,imshow3(abs(A),[0 10],[2 6])

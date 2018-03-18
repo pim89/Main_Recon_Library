@@ -27,6 +27,8 @@ end
 MR=MRecon(loc);
 MR=reconframe_read_sort_correct(MR,type);
 kspace_data=MR.Data;
-save([curdir,'kspace_data.mat'],'kspace_data');
+if type 
+    save([curdir,'kspace_data.mat'],'kspace_data');
+end
 
 end
