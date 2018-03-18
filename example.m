@@ -171,8 +171,8 @@ Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5);
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
 
 % Prewhitenen noise and do recons for both cases
 kspace_data_prew=noise_prewhitening(kspace_data,noise_data);

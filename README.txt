@@ -2,7 +2,7 @@ PROJECT DESCRIPTION:
 	Setup a modular reconstruction framework that allows for easy prototyping and has all the available resources.
 
 	Init: T. Bruijnen @ 20180316
-	Last edit: T. Bruijnen 20180317
+	Last edit: T. Bruijnen @ 20180318
 
 
 Data format:
@@ -17,12 +17,13 @@ Tested and supported features:
 	Read par/rec data from reconframe
 	Extract PPE parameters from reconframe --> Template?
 	Radial trajectory and density functions work now
-	Radial phase corrections works now
+	Radial phase corrections zero method
     	Openadapt and espirit matlab implementations work now
     	Option to load k-space data from directory if it was saved
 	Iterative density estimation code works for 3D
 	Respiratory motion estimation from multi-channel data (coil clustering)
 	Respiratory phases binning and transformation of matrices
+	Noise prewhitening included
 
 
 TODO:
