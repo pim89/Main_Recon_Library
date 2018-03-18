@@ -213,3 +213,38 @@ for z=1:size(kspace_data,3)
     end    
 end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+
+%% Iterative sense least squares 
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data);
+
+% Estimate coil maps from lowres images
+lr=5; % 5 times lower resolution
+mask=radial_lowres_mask(kdim(1:2),lr);
+F2D=FG2D(traj,kdim);
+lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+csm=openadapt(lowres);
+
+S=SS(csm);
+% Loop over z and initialize operator
+for z=1:size(kspace_data,3)
+    par.S=SS(csm(:,:,z,:));
+    par.N=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
+    par.kdim=[kdim(1:2) 1 kdim(4)];
+    par.D
+end
+
+% %TV
+% NUFFT
+% S
+% DCF
+% kdim
+% idim
+% kspace data
+% Niter

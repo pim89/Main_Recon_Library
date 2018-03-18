@@ -30,7 +30,7 @@ dcf=radial_density(traj);
 MR.Data=ifft(MR.Data,[],3);
 
 % Radial phase correction
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Initialize Fessler 2D nufft operator
 F2D=FG2D(traj,[kdim(1:2) 1]);
@@ -60,7 +60,7 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:3),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
@@ -82,7 +82,7 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-radial_phase_correction_zero(MR.Data);
+MR.Data=radial_phase_correction_zero(MR.Data);
 MR.Data=ifft(MR.Data,[],3);
 
 % Create low-res images using a k-space mask
@@ -116,7 +116,7 @@ end
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
@@ -130,7 +130,7 @@ kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 
 % Estimation respiratory motion signal from multichannel data
 respiration=radial_3D_estimate_motion(kspace_data);
@@ -154,7 +154,7 @@ kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
-radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_zero(kspace_data);
 respiration=radial_3D_estimate_motion(kspace_data);
 
 % Define number of phases and do phase-binning
@@ -172,24 +172,79 @@ slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+
+% Prewhitenen noise and do recons for both cases
+kspace_data_prew=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data_prew=ifft(kspace_data_prew,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data);
+kspace_data_prew=radial_phase_correction_zero(kspace_data_prew);
+F2D=FG2D(traj,[kdim(1:2) 1]);
+for z=1:size(kspace_data,3)
+    for c=1:1%size(kspace_data,4)
+        normal(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf);
+        prew(:,:,z,c)=F2D'*(kspace_data_prew(:,:,z,c).*dcf);
+    end    
+end
+
+% Show difference
+normal=normal/mean(abs(normal(:)));
+prew=prew/mean(abs(prew(:)));
+A=zeros(140,140,12);
+A(:,:,1:6)=normal(:,:,10:2:20,1);
+A(:,:,7:12)=prew(:,:,10:2:20,1);
+figure,imshow3(abs(A),[0 30],[2 6])
+
+%% Fitting radial phase correction
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_model(kspace_data,traj);
+F2D=FG2D(traj,[kdim(1:2) 1]);
+for z=1:size(kspace_data,3)
+    for c=1:1%size(kspace_data,4)
+        img(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf);
+    end    
+end
+close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+
+%% Iterative sense least squares 
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
-radial_phase_correction_zero(kspace_data);
-G2D=GG2D(traj,[kdim(1:2) 1]);
-for z=1:size(kspace_data,3)
-    for c=1:1%size(kspace_data,4)
-        Greengard2D(:,:,z,c)=G2D'*(kspace_data(:,:,z,c).*dcf);
-    end    
-end
-figure,imshow3(abs(Greengard2D(:,:,5:28,1)),[],[4 6])
+kspace_data=radial_phase_correction_zero(kspace_data);
 
-normal=demean(abs(normal));
-normal=demean(abs(prew));
-A=zeros(140,140,6);
-A(:,:,1:3)=normal(:,:,18:20,1);
-A(:,:,4:6)=prew(:,:,18:20,1);
-figure,imshow3(abs(A),[],[2 3])
+% Estimate coil maps from lowres images
+lr=5; % 5 times lower resolution
+mask=radial_lowres_mask(kdim(1:2),lr);
+F2D=FG2D(traj,kdim);
+lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+csm=openadapt(lowres);
+
+S=SS(csm);
+% Loop over z and initialize operator
+for z=1:size(kspace_data,3)
+    par.S=SS(csm(:,:,z,:));
+    par.N=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
+    par.kdim=[kdim(1:2) 1 kdim(4)];
+    
+end
+
+% %TV
+% NUFFT
+% S
+% DCF
+% kdim
+% idim
+% kspace data
+% Niter
