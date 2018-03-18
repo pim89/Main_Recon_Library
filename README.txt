@@ -25,6 +25,8 @@ Tested and supported features:
 	Respiratory phases binning and transformation of matrices
 	Noise prewhitening included
 	Radial phase correction model-based
+	General TV operator as sparse matrix
+	LSQR iterative L2 TV sense
 
 
 TODO:
