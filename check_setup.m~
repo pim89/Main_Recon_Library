@@ -12,9 +12,9 @@ end
 try
     bart;
 catch
-    suc6=0;
     if isempty(which('bart'))
         disp('>> BART toolbox is not added to the path');
+        suc6=0;
     else
         disp('>> BART toolbox is not installed');
     end
@@ -25,52 +25,28 @@ try
     nufft2d1(1,1,1,1,1,1E-15,1,1);
     nufft3d1(1,1,1,1,1,1,1E-15,1,1,1);
 catch
-    suc6=0;
     if isempty(which('nufft2d1')) || isempty(which('nufft3d1'))
-        disp('>> Greengard NUFFT toolbox not added to path');
-    else
-        disp('>> Greengard NUFFT toolbox not compiled');
+        disp('Warning: Greengard NUFFT toolbox not fully installed or not added to path');suc6=0;
     end
 end
 
 % Check if Fessler NUFFT toolbox works
-try
-    back_grid(1+1j,1,1,1,1,1,1,1,1);
-catch
-    suc6=0;
-    if isempty(which('nufft2d1')) || isempty(which('nufft3d1'))
-        disp('>> Fessler NUFFT toolbox not added to path');
-    else
-        disp('>> Fessler NUFFT toolbox not compiled');
-    end
+if isempty(which('nufft_init')) 
+    disp('Warning: Fessler NUFFT toolbox not fully installed or not added to path');suc6=0;
 end
 
 % Check if Reconframe is added to the path
-try
-    fftshiftc(single(1),(1));
-catch
-    suc6=0;
-    if isempty(which('MRecon'))
-        disp('>> Reconframe is not added to the path');
-    else
-         disp('>> Reconframe is not installed/compiled');
-    end
+if isempty(which('MRecon'))
+    disp('Warning: Reconframe is not added to the path');suc6=0;
 end
 
 % Check if iterative DCF code is added to the path
-try
-    a=sdc3_MAT(.5*rand(3,2,2,2),1,2,0);
-catch
-    suc6=0;
-    if isempty(which('sdc3_MAT'))
-        disp('>> Iterative DCF code is not added to the path');
-    else
-        disp('>> Iterative DCF code is not installed');
-    end
+if isempty(which('sdc3_MAT'))
+    disp('Warning: Iterative DCF code is not added to the path');suc6=0;
 end
 
 % Succesfull integration
 if suc6
-    disp('>> All toolboxes are succesfully installed and included to path')
+    disp('All toolboxes are succesfully installed and included to path')
 end
 
