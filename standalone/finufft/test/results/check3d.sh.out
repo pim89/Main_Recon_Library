@@ -1,0 +1,9 @@
+test 3d type-1:
+one mode: rel err in F[1,2,-7] is 6.28e-13
+dirft3d: rel l2-err of result F is 1.25e-12
+test 3d type-2:
+one targ: rel err in c[500] is 6.54e-13
+dirft3d: rel l2-err of result c is 1.09e-12
+test 3d type-3:
+one targ: rel err in F[500] is 8.71e-13
+dirft3d: rel l2-err of result F is 3e-12

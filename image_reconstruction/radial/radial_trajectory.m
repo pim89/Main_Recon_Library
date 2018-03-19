@@ -62,7 +62,7 @@ else
     
     % Simple z for stack-of-stars (linear increment)
     if kdim(3) > 1
-        if mod(kdim(3),2)>0 % iseven
+        if mod(kdim(3),2)==0 % is_odd
             kz=linspace(-kdim(3)/2,kdim(3)/2,kdim(3)+1);kz(end)=[];
         else
             kz=linspace(-kdim(3)/2,kdim(3)/2,kdim(3));

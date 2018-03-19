@@ -1,0 +1,15 @@
+TO compile:
+
+(1) Have to change line 46 in makefile to right mex path:
+
+MEX = /nfs/rtsan01/groupdata/packages/stow/Matlab2015a/bin/mex
+
+(2) Now cleanup everything:
+
+$ make objclean
+
+(3) Finally compile for matlab WITHOUT OpenMP option:
+
+$ make matlab OMP=OFF
+
+
