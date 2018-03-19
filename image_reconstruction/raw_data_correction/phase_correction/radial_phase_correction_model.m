@@ -7,7 +7,7 @@ function kspace_data = radial_phase_correction_model(kspace_data,traj)
 
 kdim=size(kspace_data);
 cp=kdim(1)/2+1;
-rad_ang=mod(squeeze(angle(traj(1,1,:)+1j*traj(2,1,:)))+pi,2*pi);
+rad_ang=mod(squeeze(angle(traj(1,1,:,1)+1j*traj(2,1,:,1)))+pi,2*pi);
 model_pars=zeros([2 kdim(3:end)]);
 
 % Loop over all partitions and estimate phase error model 
