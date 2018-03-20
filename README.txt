@@ -2,7 +2,7 @@ PROJECT DESCRIPTION:
 	Setup a modular reconstruction framework that allows for easy prototyping and has all the available resources.
 
 	Init: T. Bruijnen @ 20180316
-	Last edit: T. Bruijnen @ 20180318
+	Last edit: T. Bruijnen @ 20180320
 
 
 Data format:
@@ -26,13 +26,17 @@ Tested and supported features:
 	Noise prewhitening included
 	Radial phase correction model-based
 	General TV operator as sparse matrix
-	LSQR iterative L2 TV sense
+	LSQR iterative L2 TV sense 2D
 	FlatIron 2D/3D NUFFT added
-
+	LSQR iterative L2 TV sense 3D
+	NLCG iterative L1 TV sense 2D / 3D
 
 TODO:
 	Integrate NUFFT code from FlatIron https://github.com/dfm/finufft/tree/master/matlab
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
 	Fessler 3D NUFFT shift bug
+	General sliding window operator
+	Method to process the GIRF
+
 
