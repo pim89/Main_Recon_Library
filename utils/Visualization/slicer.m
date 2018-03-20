@@ -1,4 +1,4 @@
-function slicer2(data,aspect)
+function slicer(data,aspect)
 %% Function for displaying 3D/4D data sets
 %
 % INPUT:    - data (either 3D or 4D, with time as 4th dimension)

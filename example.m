@@ -259,7 +259,7 @@ kspace_data=radial_phase_correction_zero(kspace_data);
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,kdim);
-lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+lowres=F2D'*(kspace_data.*repmat(dcf.*mask,[1 1 kdim(3) kdim(4)]));
 csm=openadapt(lowres);
 
 % Initialize structure to send to the solver for 2D
@@ -284,18 +284,18 @@ kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=radial_density(traj);
-kspace_data=radial_phase_correction_model(kspace_data,traj);
+kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zero phase correction for 3D gridding
 
 % Estimate coil maps from lowres images
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:3),lr);
 F3D=FG3D(traj,kdim);
-lowres=F3D'*(kspace_data.*repmat(dcf,[1 1 1 kdim(4)]));
+lowres=F3D'*(kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
 csm=openadapt(lowres);
 
 clear par
 % Initialize structure to send to the solver for 3D
-par.kdim=c12d([kdim(1:4)]);
+par.kdim=c12d(kdim(1:4));
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=1;
 par.N=F3D;
@@ -306,7 +306,6 @@ par.TV=TV_sparse(par.idim,[1 1 1 0 0],[10 10 10 0 0]);
 par.y=par.W*kspace_data;
 par.S=SS(csm);  
 [itsense,~]=configure_regularized_iterative_sense(par);    
-
 
 %% L1 iterative TV sense (L1+TV) -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
@@ -339,3 +338,42 @@ for z=1:size(kspace_data,3)
     par.S=SS(csm(:,:,z,:));  
     [compressed_sense(:,:,z),~]=configure_compressed_sense(par);   
 end
+
+%% Real-time 3D L1 TV compressed sense
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:3),1);
+dcf=radial_density(traj);
+kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zero phase correction for 3D gridding
+
+% Estimate coil maps from lowres images
+lr=5; % 5 times lower resolution
+mask=radial_lowres_mask(kdim(1:3),lr);
+F3D=FG3D(traj,kdim);
+lowres=F3D'*(kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
+csm=openadapt(lowres);
+
+% Transform data dimensions to dynamics
+R=10;
+[kspace_data,traj,dcf]=radial_goldenangle_undersample(R,kspace_data,traj,dcf);
+kdim=size(kspace_data);
+
+% MATLAB solver (nlcg)
+par.kdim=c12d(kdim(1:5));
+par.idim=idim_from_trajectory(traj,par.kdim);
+par.Niter=5;
+par.N=GG3D(traj,kdim(1:5));
+par.W=DCF(sqrt(dcf));
+par.TV=TV_sparse(par.idim,[0 0 0 0 1],[0 0 0 0 50]);
+par.beta=.2; % step-size of CG
+par.y=par.W*kspace_data;
+par.S=SS(csm);  
+
+% Nufft recon
+tic
+recon_nufft=par.S*(par.N'*(par.W*(par.W*kspace_data)));
+toc
+% CS recon
+compressed_sense=configure_compressed_sense(par);   
