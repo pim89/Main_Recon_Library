@@ -27,10 +27,12 @@ Tested and supported features:
 	Radial phase correction model-based
 	General TV operator as sparse matrix
 	LSQR iterative L2 TV sense
+	FlatIron 2D/3D NUFFT added
 
 
 TODO:
 	Integrate NUFFT code from FlatIron https://github.com/dfm/finufft/tree/master/matlab
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
+	Fessler 3D NUFFT shift bug
 

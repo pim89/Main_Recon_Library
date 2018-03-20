@@ -17,7 +17,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 %MR.Perform;
 %writeDicomFromMRecon(MR,MR.Data,'../Main_Recon_Library/');
 
-%% NUFFT toolboxes
+%% NUFFT toolboxes 2D
 % Radial k-space trajectory (/./ not /../)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
@@ -70,14 +70,15 @@ end
 toc
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
-%% Reload data for 3D NUFFT
+%% NUFFT toolboxes 3D
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:3),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-MR.Data=radial_phase_correction_zero(MR.Data);
-traj=fftshift(traj,4);
+kspace_data=MR.Data;
+MR.Data=radial_phase_correction_model(MR.Data,traj);
+
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
 tic
@@ -111,8 +112,8 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-MR.Data=radial_phase_correction_zero(MR.Data);
 MR.Data=ifft(MR.Data,[],3);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Create low-res images using a k-space mask
 lr=5; % 5 times lower resolution
@@ -137,8 +138,9 @@ figure,imshow3(abs(CSM_opd_3D(:,:,15,:)),[],[2 6])
 
 % ESPIRiT 2D (either matlab-based (slow) or bart-based (fast)
 for z=15:15%1:size(MR.Data,3)
-    csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:));
+    csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:),'bart');
 end
+figure,imshow3(abs(csm(:,:,15,:)),[],[2 6])
 
 %% Iterative density estimation code (only 3D)
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
@@ -243,7 +245,7 @@ for z=1:size(kspace_data,3)
 end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
-%% Iterative sense least squares (L2+TV) -- matlab implementation
+%% 2Iterative sense least squares (L2+TV) -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
 [noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);

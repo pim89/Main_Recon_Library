@@ -3,7 +3,7 @@ function idim = idim_from_trajectory(traj,kdim)
 % Image dimensions are encoded in the k-space trajectory bounds.
 
 idim(1:2)=ceil(max(abs(traj(1,:))));
-idim(3)=ceil(max(abs(traj(3,:))));
+idim(3)=ceil(2*max(abs(traj(3,:))));
 if idim(3)==0; idim(3)=1;end
 idim=c12d([idim kdim(4:end)]);
 

@@ -17,7 +17,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 %MR.Perform;
 %writeDicomFromMRecon(MR,MR.Data,'../Main_Recon_Library/');
 
-%% NUFFT toolboxes
+%% NUFFT toolboxes 2D
 % Radial k-space trajectory (/./ not /../)
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
@@ -70,7 +70,7 @@ end
 toc
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
-%% Reload data for 3D NUFFT
+%% NUFFT toolboxes 3D
 [~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
@@ -112,8 +112,8 @@ kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
 dcf=radial_density(traj);
-MR.Data=radial_phase_correction_zero(MR.Data);
 MR.Data=ifft(MR.Data,[],3);
+MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Create low-res images using a k-space mask
 lr=5; % 5 times lower resolution
@@ -138,8 +138,9 @@ figure,imshow3(abs(CSM_opd_3D(:,:,15,:)),[],[2 6])
 
 % ESPIRiT 2D (either matlab-based (slow) or bart-based (fast)
 for z=15:15%1:size(MR.Data,3)
-    csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:));
+    csm(:,:,z,:)=espirit(Fessler2D_LR(:,:,z,:),'bart');
 end
+figure,imshow3(abs(csm(:,:,15,:)),[],[2 6])
 
 %% Iterative density estimation code (only 3D)
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
@@ -244,7 +245,7 @@ for z=1:size(kspace_data,3)
 end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
-%% Iterative sense least squares (L2+TV) -- matlab implementation
+%% 2D Iterative sense least squares (L2+TV) -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
 [noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
@@ -261,7 +262,7 @@ F2D=FG2D(traj,kdim);
 lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 csm=openadapt(lowres);
 
-%Initialize structure to send to the solver
+% Initialize structure to send to the solver for 2D
 par.kdim=c12d([kdim(1:2) 1 kdim(4)]);
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=1;
@@ -275,6 +276,37 @@ for z=1:size(kspace_data,3)
     par.S=SS(csm(:,:,z,:));  
     [itsense(:,:,z),~]=configure_regularized_iterative_sense(par);    
 end
+
+%% 3D Iterative sense least squares (L2+TV) -- matlab implementation
+[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:3),1);
+dcf=radial_density(traj);
+kspace_data=radial_phase_correction_model(kspace_data,traj);
+
+% Estimate coil maps from lowres images
+lr=5; % 5 times lower resolution
+mask=radial_lowres_mask(kdim(1:3),lr);
+F3D=FG3D(traj,kdim);
+lowres=F3D'*(kspace_data.*repmat(dcf,[1 1 1 kdim(4)]));
+csm=openadapt(lowres);
+
+clear par
+% Initialize structure to send to the solver for 3D
+par.kdim=c12d([kdim(1:4)]);
+par.idim=idim_from_trajectory(traj,par.kdim);
+par.Niter=1;
+par.N=F3D;
+par.W=DCF(sqrt(dcf));
+par.TV=TV_sparse(par.idim,[1 1 1 0 0],[10 10 10 0 0]);
+
+% Loop over slices and do itSense
+par.y=par.W*kspace_data;
+par.S=SS(csm);  
+[itsense,~]=configure_regularized_iterative_sense(par);    
+
 
 %% L1 iterative TV sense (L1+TV) -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
