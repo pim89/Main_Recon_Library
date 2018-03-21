@@ -30,13 +30,14 @@ Tested and supported features:
 	FlatIron 2D/3D NUFFT added
 	LSQR iterative L2 TV sense 3D
 	NLCG iterative L1 TV sense 2D / 3D
+	Generic view sharing function
 
 TODO:
-	Integrate NUFFT code from FlatIron https://github.com/dfm/finufft/tree/master/matlab
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
 	Fessler 3D NUFFT shift bug
-	General sliding window operator
+	Greengard 3D forward NUFFT operation seems to be bugged
 	Method to process the GIRF
+	Verbose arguments to all functions
 
 

@@ -365,7 +365,7 @@ kdim=size(kspace_data);
 par.kdim=c12d(kdim(1:5));
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=5;
-par.N=GG3D(traj,kdim(1:5));
+par.N=FG3D(traj,kdim(1:5));
 par.W=DCF(sqrt(dcf));
 par.TV=TV_sparse(par.idim,[0 0 0 0 1],[0 0 0 0 50]);
 par.beta=.2; % step-size of CG
@@ -373,11 +373,12 @@ par.y=par.W*kspace_data;
 par.S=SS(csm);  
 
 % Nufft recon
-tic
 recon_nufft=par.S*(par.N'*(par.W*(par.W*kspace_data)));
-toc
+close all;figure,imshow3(abs(recon_nufft(:,:,5:28,1,1)),[],[4 6])
+
 % CS recon
 compressed_sense=configure_compressed_sense(par);   
+figure,imshow3(abs(compressed_sense(:,:,5:28,1,1)),[],[4 6])
 
 %% View sharing operation, can be in any dimensions
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
