@@ -1,16 +1,17 @@
 %% Demonstration script
 % Note: for windows replace all "/" with "/" and vice versa.
 clear all;close all;clc
+datapath='../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw';
 
 %% Readers & Writers
 % Get k-space data from lab/raw
-kdata=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+kdata=reader_reconframe_lab_raw(datapath);
 
 % Get images from par/rec
 %images=reader_reconframe_par_rec('/local_scratch/tbruijne/WorkingData/4DLung/Scan2/ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
 
 % Extract PPE parameters (from reconframe object)
-[kdata,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[kdata,MR]=reader_reconframe_lab_raw(datapath);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Write data to dicom
@@ -19,7 +20,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 
 %% NUFFT toolboxes 2D
 % Radial k-space trajectory (/./ not /../)
-[~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[~,MR]=reader_reconframe_lab_raw(datapath);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
@@ -71,7 +72,7 @@ toc
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
 %% NUFFT toolboxes 3D
-[~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[~,MR]=reader_reconframe_lab_raw(datapath);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:3),ppe_pars.goldenangle);
@@ -107,7 +108,7 @@ toc
 figure,imshow3(abs(FlatIron3D(:,:,5:28,1)),[],[4 6])
 
 %% Coil sensitivity map estimation (espirit and openadapt)
-[~,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[~,MR]=reader_reconframe_lab_raw(datapath);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
@@ -143,7 +144,7 @@ end
 figure,imshow3(abs(csm(:,:,15,:)),[],[2 6])
 
 %% Iterative density estimation code (only 3D)
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw');
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
@@ -156,7 +157,7 @@ for c=1:1%size(MR.Data,4)
 end
 
 %% Estimate respiratory signal from multi-channel k-space data + motion weighted reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -180,7 +181,7 @@ end
 close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
 
 %% 4D (x,y,z,resp) reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -202,8 +203,8 @@ Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 
 % Prewhitenen noise and do recons for both cases
 kspace_data_prew=noise_prewhitening(kspace_data,noise_data);
@@ -231,7 +232,7 @@ A(:,:,7:12)=prew(:,:,10:2:20,1);
 figure,imshow3(abs(A),[0 30],[2 6])
 
 %% Fitting radial phase correction
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -246,8 +247,8 @@ end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
 %% 2D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -278,8 +279,8 @@ for z=1:size(kspace_data,3)
 end
 
 %% 3D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -308,8 +309,8 @@ par.S=SS(csm);
 [itsense,~]=configure_regularized_iterative_sense(par);    
 
 %% L1 iterative TV sense (L1+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -340,8 +341,8 @@ for z=1:size(kspace_data,3)
 end
 
 %% Real-time 3D L1 TV compressed sense
-[kspace_data,MR]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',1,1);
-[noise_data,~]=reader_reconframe_lab_raw('../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw',5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -377,3 +378,28 @@ recon_nufft=par.S*(par.N'*(par.W*(par.W*kspace_data)));
 toc
 % CS recon
 compressed_sense=configure_compressed_sense(par);   
+
+%% View sharing operations
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:3),1);
+dcf=radial_density(traj);
+kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zero phase correction for 3D gridding
+
+% Transform data dimensions to dynamics
+R=3;
+[kspace_data,traj,dcf]=radial_goldenangle_undersample(R,kspace_data,traj,dcf);
+
+% View sharing across dynamics
+kspace_data=radial_view_sharing(kspace_data,[],3,[2 5]);
+traj=radial_view_sharing(traj,[],3,[3 5]);
+dcf=radial_view_sharing(dcf,[],3,[2 5]);
+kdim=size(kspace_data);
+
+% NUFFT
+F2D=FG2D(traj,kdim);
+img=F2D'*(kspace_data.*dcf);
+
+close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])

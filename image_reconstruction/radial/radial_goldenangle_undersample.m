@@ -16,6 +16,8 @@ ddim(2)=floor(ddim(2)/ddim(5));
 
 % Remove residual readouts
 kspace_data=kspace_data(:,1:prod(kdim([2 5])),:,:,:,:,:,:,:,:,:,:);
+traj=traj(:,:,1:1:prod(tdim([3 5])),:,:,:,:,:,:,:,:,:,:);
+dcf=dcf(:,1:prod(ddim([2 5])),:,:,:,:,:,:,:,:,:,:);
 
 % Align ky and dynamics
 kspace_data=permute(kspace_data,[1 3 4 6 7 8 9 10 11 12 2 5]);
