@@ -15,10 +15,10 @@ Data format:
 Tested and supported features:
 	Read lab/raw data from reconframe
 	Read par/rec data from reconframe
-	Extract PPE parameters from reconframe --> Template?
-	Radial trajectory and density functions work now
+	Extract PPE parameters from reconframe 
+	Radial trajectory and density functions 
 	Radial phase corrections zero method
-    	Openadapt and espirit matlab implementations work now
+    	Openadapt and espirit matlab implementations 
     	Option to load k-space data from directory if it was saved
 	Iterative density estimation code works for 3D
 	Respiratory motion estimation from multi-channel data (coil clustering)
@@ -33,11 +33,14 @@ Tested and supported features:
 	Generic view sharing function
 
 TODO:
-	BART radial trajectory add tiny golden angle
-	Iterative DCF estimation for 2D trajectories
+	GIRF processing
+	NUFFT using BART
+	Iterative reconstructions using BART
+	Scale regularization parameters in reconstruction same in BART + matlab	
 	Fessler 3D NUFFT shift bug
 	Greengard 3D forward NUFFT operation seems to be bugged
-	Method to process the GIRF
 	Verbose arguments to all functions
+	BART radial trajectory add tiny golden angle
+	Iterative DCF estimation for 2D trajectories
 
 

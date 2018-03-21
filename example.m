@@ -395,14 +395,20 @@ R=10;
 [kspace_data,traj,dcf]=radial_goldenangle_undersample(R,kspace_data,traj,dcf);
 
 % View sharing across dynamics
-width=1;
-kspace_data=radial_view_sharing(kspace_data,[],width,[2 5]);
-traj=radial_view_sharing(traj,[],width,[3 5]);
-dcf=radial_view_sharing(dcf,[],width,[2 5]);
+width=3;
+kwic=[]; % Filters are supported as function handles
+kspace_data=radial_view_sharing(kspace_data,kwic,width,[2 5]);
+traj=radial_view_sharing(traj,kwic,width,[3 5]);
+dcf=radial_view_sharing(dcf,kwic,width,[2 5]);
 kdim=size(kspace_data);
 
 % NUFFT
 F2D=FG2D(traj,kdim);
 img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
-
-close all;figure,imshow3(abs(img(:,:,5:28,1,1)),[],[4 6])
+idim=size(img);
+S=SS(ones(idim(1:4))); % Sum of squares
+img=S*img;
+for t=1:idim(5)
+    img(:,:,:,:,t)=img(:,:,:,:,t)/max(matrix_to_vec(abs(img(:,:,:,:,t))));
+end
+close all;slicer(squeeze(img))

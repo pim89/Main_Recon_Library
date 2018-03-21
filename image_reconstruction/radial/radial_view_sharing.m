@@ -13,7 +13,7 @@ end
 
 % Get dimensions
 dims=size(data);
-f=@(ww,w)(w*(ww-1)+1);
+f=@(ww)(2*(ww-1)+1);
 
 % Get output dimensions and preallocate
 ndims=dims;ndims(dim(1))=ndims(dim(1))+2*width*ndims(dim(1));
@@ -32,28 +32,27 @@ for t=1:dims(dim(2))
     
     % Fill in old data
     tmp=dynamic_indexing(data,dim(2),t); 
-    fin{t}=dynamic_indexing(fin{t},dim(1),f(1,width):dims(dim(1)),tmp);
+    fin{t}=dynamic_indexing(fin{t},dim(1),f(1):dims(dim(1)),tmp);
     
     % Fill in shared data
     for w=1:width
         % Curval 1 / 2 process both sides
         if t+w < 1 || t+w > dims(dim(2))
-            curval1=zeros(size(tmp));
+            curval1=zeros(size(tmp),'single');
         else
             curval1=kernel(abs(w))*dynamic_indexing(data,dim(2),t+w);
         end
         if t-w < 1 || t-w > dims(dim(2))
-            curval2=zeros(size(tmp));
+            curval2=zeros(size(tmp),'single');
         else
             curval2=kernel(abs(w))*dynamic_indexing(data,dim(2),t-w);
         end
         
         % Assign to large matrix
-        idx1=1+f(w,width)*dims(dim(1)):2*f(w,width)*dims(dim(1));
-        idx2=1+(f(w,width)+1)*dims(dim(1)):(2*f(w,width)+1)*dims(dim(1));
+        idx1=1+f(w)*dims(dim(1)):(1+f(w))*dims(dim(1));
+        idx2=1+(f(w)+1)*dims(dim(1)):(2+f(w))*dims(dim(1));
         fin{t}=dynamic_indexing(fin{t},dim(1),idx1,curval1);
         fin{t}=dynamic_indexing(fin{t},dim(1),idx2,curval2);
-        
     end        
     
     % Display
