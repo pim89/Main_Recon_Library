@@ -9,7 +9,7 @@ function res = dynamic_indexing(A,b,c,varargin)
 
 sz=size(A);
 
-if b == 0  || b > numel(sz) || c > sz(b)
+if b == 0  || b > numel(sz) || nnz(c > sz(b)) > 1
     if ~isempty(varargin)
         res=varargin{1};
     else
@@ -30,7 +30,7 @@ else
         if n~=b
             Adims=[Adims sz(n)];
         else
-            Adims=[Adims 1];
+            Adims=[Adims numel(c)];
         end
     end
     A(inds{:})=reshape(varargin{1},Adims);

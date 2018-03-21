@@ -379,27 +379,29 @@ toc
 % CS recon
 compressed_sense=configure_compressed_sense(par);   
 
-%% View sharing operations
+%% View sharing operation, can be in any dimensions
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
 [noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
-traj=radial_trajectory(kdim(1:3),1);
+traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
-kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zero phase correction for 3D gridding
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data);
 
 % Transform data dimensions to dynamics
-R=3;
+R=10;
 [kspace_data,traj,dcf]=radial_goldenangle_undersample(R,kspace_data,traj,dcf);
 
 % View sharing across dynamics
-kspace_data=radial_view_sharing(kspace_data,[],3,[2 5]);
-traj=radial_view_sharing(traj,[],3,[3 5]);
-dcf=radial_view_sharing(dcf,[],3,[2 5]);
+width=1;
+kspace_data=radial_view_sharing(kspace_data,[],width,[2 5]);
+traj=radial_view_sharing(traj,[],width,[3 5]);
+dcf=radial_view_sharing(dcf,[],width,[2 5]);
 kdim=size(kspace_data);
 
 % NUFFT
 F2D=FG2D(traj,kdim);
-img=F2D'*(kspace_data.*dcf);
+img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
 
-close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+close all;figure,imshow3(abs(img(:,:,5:28,1,1)),[],[4 6])

@@ -32,8 +32,13 @@ for t=1:dims(dim(2))
     
     % Fill in old data
     tmp=dynamic_indexing(data,dim(2),t); 
-    fin{t}=dynamic_indexing(fin{t},dim(1),f(1,width):dims(dim(1)),tmp);
+    fin{t}=dynamic_indexing(fin{t},dim(1),f(1,width),tmp);
     
+%     for j=1:dims(dim(1))
+%         A=dynamic_indexing(dynamic_indexing(data,dim(2),t),dim(1),j);
+%         fin{t}=dynamic_indexing(fin{t},dim(1),j,A);
+%     end   
+        
     % Fill in shared data
     for w=1:width
         % Curval 1 / 2 process both sides
@@ -53,11 +58,17 @@ for t=1:dims(dim(2))
         idx2=1+(f(w,width)+1)*dims(dim(1)):(2*f(w,width)+1)*dims(dim(1));
         fin{t}=dynamic_indexing(fin{t},dim(1),idx1,curval1);
         fin{t}=dynamic_indexing(fin{t},dim(1),idx2,curval2);
-        
+
+        for k=1:dims(dim(1))
+            A1=dynamic_indexing(curval1,dim(1),k);
+            A2=dynamic_indexing(curval2,dim(1),k);
+            fin{t}=dynamic_indexing(fin{t},dim(1),6*(w-1)+2*k-1,A1);
+            fin{t}=dynamic_indexing(fin{t},dim(1),1+6*(w-1)+2*k-1,A2);
+        end
     end        
     
     % Display
-    %disp(['Timepoint  =  ',num2str(t),' / ',num2str(dims(dim(2)))])
+    disp(['Timepoint  =  ',num2str(t),' / ',num2str(dims(dim(2)))])
 end
     
 % Index everything
