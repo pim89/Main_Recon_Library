@@ -31,9 +31,12 @@ Tested and supported features:
 	LSQR iterative L2 TV sense 3D
 	NLCG iterative L1 TV sense 2D / 3D
 	Generic view sharing function
+	GIRF trajectory estimation 
+	GIRF phase error estimation
+	Added an UTE dataset to test the GIRFs
+	Coil compression using BART 
 
 TODO:
-	GIRF processing
 	NUFFT using BART
 	Iterative reconstructions using BART
 	Scale regularization parameters in reconstruction same in BART + matlab	
@@ -42,5 +45,6 @@ TODO:
 	Verbose arguments to all functions
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
+	Phase correction using the reconframe method
 
 

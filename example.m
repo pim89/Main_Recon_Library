@@ -1,17 +1,17 @@
 %% Demonstration script
 % Note: for windows replace all "/" with "/" and vice versa.
 clear all;close all;clc
-datapath='../Data/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw';
-
+datapath1='../Data/SOS_GA/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
+datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
 %% Readers & Writers
 % Get k-space data from lab/raw
-kdata=reader_reconframe_lab_raw(datapath);
+kdata=reader_reconframe_lab_raw(datapath1);
 
 % Get images from par/rec
 %images=reader_reconframe_par_rec('/local_scratch/tbruijne/WorkingData/4DLung/Scan2/ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
 
 % Extract PPE parameters (from reconframe object)
-[kdata,MR]=reader_reconframe_lab_raw(datapath);
+[kdata,MR]=reader_reconframe_lab_raw(datapath1);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Write data to dicom
@@ -20,7 +20,7 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 
 %% NUFFT toolboxes 2D
 % Radial k-space trajectory (/./ not /../)
-[~,MR]=reader_reconframe_lab_raw(datapath);
+[~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 
@@ -72,7 +72,7 @@ toc
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
 %% NUFFT toolboxes 3D
-[~,MR]=reader_reconframe_lab_raw(datapath);
+[~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:3),ppe_pars.goldenangle);
@@ -108,7 +108,7 @@ toc
 figure,imshow3(abs(FlatIron3D(:,:,5:28,1)),[],[4 6])
 
 %% Coil sensitivity map estimation (espirit and openadapt)
-[~,MR]=reader_reconframe_lab_raw(datapath);
+[~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
 traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
@@ -144,7 +144,7 @@ end
 figure,imshow3(abs(csm(:,:,15,:)),[],[2 6])
 
 %% Iterative density estimation code (only 3D)
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
 dcf=iterative_dcf_estimation(traj);
@@ -157,7 +157,7 @@ for c=1:1%size(MR.Data,4)
 end
 
 %% Estimate respiratory signal from multi-channel k-space data + motion weighted reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -181,7 +181,7 @@ end
 close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
 
 %% 4D (x,y,z,resp) reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -203,8 +203,8 @@ Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 
 % Prewhitenen noise and do recons for both cases
 kspace_data_prew=noise_prewhitening(kspace_data,noise_data);
@@ -232,7 +232,7 @@ A(:,:,7:12)=prew(:,:,10:2:20,1);
 figure,imshow3(abs(A),[0 30],[2 6])
 
 %% Fitting radial phase correction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -247,8 +247,8 @@ end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
 %% 2D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -279,8 +279,8 @@ for z=1:size(kspace_data,3)
 end
 
 %% 3D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -309,8 +309,8 @@ par.S=SS(csm);
 [itsense,~]=configure_regularized_iterative_sense(par);    
 
 %% L1 iterative TV sense (L1+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -341,8 +341,8 @@ for z=1:size(kspace_data,3)
 end
 
 %% Real-time 3D L1 TV compressed sense
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -381,8 +381,8 @@ compressed_sense=configure_compressed_sense(par);
 figure,imshow3(abs(compressed_sense(:,:,5:28,1,1)),[],[4 6])
 
 %% View sharing operation, can be in any dimensions
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -413,31 +413,48 @@ for t=1:idim(5)
 end
 close all;slicer(squeeze(img))
 
-%% Load gradient impulse response function and process
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath);
-kdim=size(MR.Data);
-pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_mr21.mat';
+%% Load gradient impulse response function and process a UTE acquisition
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath2);
+kspace_data=kspace_data{1};
+ppe_pars=reader_reconframe_ppe_pars(MR);
+kdim=size(kspace_data);
+pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_u2.mat';
 
 % Get k-space trajectory per gradient (carefull its in cells)!
 [girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
+girf_k={girf_k{1}};
+girf_phase={girf_phase{1}};
+%girf_k{1}(1:2,:)=girf_k{1}([2 1],:);
 
 % Change to k-space trajectory for the experiment
-traj=radial_trajectory_girf(kdim(1:2),1,girf_k);
-traj=radial_trajectory(kdim(1:2),1);
-kspace_data=ifft(kspace_data,[],3);
+traj=ute_trajectory_girf(kdim(1:3),1,girf_k);
+dcf=iterative_dcf_estimation(traj);
 
 % GIRF phase correction
-kspace_data2=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
-kspace_data2=radial_phase_correction_model(kspace_data,traj);
-kspace_data2=radial_phase_correction_zero(kspace_data);
+kspace_data=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
 
-kspace_data2=kspace_data;
 % Normal stuff
+kspace_data=ifft(kspace_data,[],3);
+F2D=FG2D(traj(:,:,:,16),kdim);
+img=F2D'*(kspace_data.*repmat(dcf,[1 1 1 kdim(4) 1]));
+img=sum(abs(img),4);
+close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
+
+%% Design my own coil compression function
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
-%kspace_data2=ifft(kspace_data2,[],3);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data);
+
+% Coil compression (after phase corrections)
+nCh=1;
+kspace_data=coil_compression(kspace_data,nCh);
+kdim=c12d(size(kspace_data));
 F2D=FG2D(traj,kdim);
-img=F2D'*(kspace_data2.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
-idim=size(img);
-S=SS(ones(idim(1:4))); % Sum of squares
-img=S*img;
-close all;slicer(squeeze(img))
+img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+img=sum(abs(img),4);
+%close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])

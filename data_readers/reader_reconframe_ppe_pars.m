@@ -4,6 +4,7 @@ function ppe_pars = reader_reconframe_ppe_pars(MR)
 % Checks for each parameter if they exist in the PPE, if so assign to
 % struct
 
+ppe_pars.goldenangle=0;
 if MR.Parameter.IsParameter('UGN1_ACQ_golden_angle');ppe_pars.goldenangle=MR.Parameter.GetValue('`UGN1_ACQ_golden_angle');end
 if MR.Parameter.IsParameter('UGN1_ACQ_ga_calibration_spokes');ppe_pars.number_of_calibration_spokes=MR.Parameter.GetValue('`UGN1_ACQ_ga_calibration_spokes');end
 if MR.Parameter.IsParameter('EX_TOM_goldenangle');ppe_pars.goldenangle=MR.Parameter.GetValue('`EX_TOM_goldenangle');end
