@@ -362,7 +362,7 @@ R=10;
 kdim=size(kspace_data);
 
 % MATLAB solver (nlcg)
-par.kdim=c12d(kdim(1:5));
+par.kdim=c12d(kdim);
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=5;
 par.N=FG3D(traj,kdim(1:5));
@@ -395,7 +395,7 @@ R=10;
 [kspace_data,traj,dcf]=radial_goldenangle_undersample(R,kspace_data,traj,dcf);
 
 % View sharing across dynamics
-width=3;
+width=2;
 kwic=[]; % Filters are supported as function handles
 kspace_data=radial_view_sharing(kspace_data,kwic,width,[2 5]);
 traj=radial_view_sharing(traj,kwic,width,[3 5]);
@@ -411,4 +411,33 @@ img=S*img;
 for t=1:idim(5)
     img(:,:,:,:,t)=img(:,:,:,:,t)/max(matrix_to_vec(abs(img(:,:,:,:,t))));
 end
+close all;slicer(squeeze(img))
+
+%% Load gradient impulse response function and process
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath);
+kdim=size(MR.Data);
+pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_mr21.mat';
+
+% Get k-space trajectory per gradient (carefull its in cells)!
+[girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
+
+% Change to k-space trajectory for the experiment
+traj=radial_trajectory_girf(kdim(1:2),1,girf_k);
+traj=radial_trajectory(kdim(1:2),1);
+kspace_data=ifft(kspace_data,[],3);
+
+% GIRF phase correction
+kspace_data2=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
+kspace_data2=radial_phase_correction_model(kspace_data,traj);
+kspace_data2=radial_phase_correction_zero(kspace_data);
+
+kspace_data2=kspace_data;
+% Normal stuff
+dcf=radial_density(traj);
+%kspace_data2=ifft(kspace_data2,[],3);
+F2D=FG2D(traj,kdim);
+img=F2D'*(kspace_data2.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+idim=size(img);
+S=SS(ones(idim(1:4))); % Sum of squares
+img=S*img;
 close all;slicer(squeeze(img))

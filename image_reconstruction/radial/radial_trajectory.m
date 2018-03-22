@@ -8,9 +8,7 @@ function traj = radial_trajectory(kdim,goldenangle,varargin)
 % - Always assumes similar partitions for stack-of-stars
 
 % Check input
-if numel(kdim)<5
-    kdim(end+1:5)=1;
-end
+kdim=c12d(kdim);
 
 % BART switch
 if ~isempty(varargin)
