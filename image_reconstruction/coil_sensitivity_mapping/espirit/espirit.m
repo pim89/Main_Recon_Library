@@ -7,7 +7,7 @@ if ~isempty(varargin)
 end
 
 % FFT image
-kimg=fft2c(img);
+kimg=fftshift(fft(fftshift(fft2c(img),3),[],3),3);
 
 if isbart
     % m selects number of coil maps

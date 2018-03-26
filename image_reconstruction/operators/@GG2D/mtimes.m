@@ -46,14 +46,14 @@ if gg.adjoint==-1 % NUFFT^(-1)
         if ~gg.parfor
             for coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
-                res_tmp(:,coil)=matrix_to_vec(nufft2d1(nj,k_tmp(2,:),...
-                    k_tmp(1,:),data_tmp(:,:,coil),-1,eps,idim(1),idim(2)))*sqrt(prod(gg.idim(1:2)));
+                res_tmp(:,coil)=matrix_to_vec(nufft2d1(nj,k_tmp(1,:),...
+                    k_tmp(2,:),data_tmp(:,:,coil),-1,eps,idim(1),idim(2)))*sqrt(prod(gg.idim(1:2)));
             end
         else
             parfor coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
-                res_tmp(:,coil)=matrix_to_vec(nufft2d1(nj,k_tmp(2,:),...
-                    k_tmp(1,:),data_tmp(:,:,coil),-1,eps,idim(1),idim(2)))*sqrt(prod(gg.idim(1:2)));
+                res_tmp(:,coil)=matrix_to_vec(nufft2d1(nj,k_tmp(1,:),...
+                    k_tmp(2,:),data_tmp(:,:,coil),-1,eps,idim(1),idim(2)))*sqrt(prod(gg.idim(1:2)));
             end
         end
 
@@ -98,14 +98,14 @@ else         % Cartesian image domain to non-Cartesian k-space || type 2
             if ~gg.parfor
                 for coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
-                    res_tmp(:,coil)=matrix_to_vec(nufft2d2(nj,k_tmp(2,:),...
-                        k_tmp(1,:),1,eps,idim(1),idim(2),data_tmp(:,:,:,coil)))/sqrt(prod(gg.idim(1:2)));
+                    res_tmp(:,coil)=matrix_to_vec(nufft2d2(nj,k_tmp(1,:),...
+                        k_tmp(2,:),1,eps,idim(1),idim(2),data_tmp(:,:,:,coil)))/sqrt(prod(gg.idim(1:2)));
                 end
             else
                 parfor coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
-                    res_tmp(:,coil)=matrix_to_vec(nufft2d2(nj,k_tmp(2,:),...
-                        k_tmp(1,:),1,eps,idim(1),idim(2),data_tmp(:,:,:,coil)))/sqrt(prod(gg.idim(1:2)));
+                    res_tmp(:,coil)=matrix_to_vec(nufft2d2(nj,k_tmp(1,:),...
+                        k_tmp(2,:),1,eps,idim(1),idim(2),data_tmp(:,:,:,coil)))/sqrt(prod(gg.idim(1:2)));
                 end
             end
 

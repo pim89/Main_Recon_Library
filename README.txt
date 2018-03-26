@@ -35,6 +35,7 @@ Tested and supported features:
 	GIRF phase error estimation
 	Added an UTE dataset to test the GIRFs
 	Coil compression using BART 
+	Radial phase correction using the reconframe method
 
 TODO:
 	NUFFT using BART
@@ -45,6 +46,6 @@ TODO:
 	Verbose arguments to all functions
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
-	Phase correction using the reconframe method
+
 
 

@@ -33,6 +33,7 @@ for n=1:numel(TVdim)
         tv=tv+lambda(n)*TV(n,idim,TVdim(n));
     end
 end
-        
+    
+disp('+TV sparse matrix operator initialized.')
 % END
 end

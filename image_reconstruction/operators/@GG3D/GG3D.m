@@ -45,5 +45,7 @@ gg.nj=numel(gg.k(1,:,:,:,1));
 % Define seperate class
 gg=class(gg,'GG3D');
 
+disp('+3D Greengard gridder operator initialized.')
+
 %END
 end

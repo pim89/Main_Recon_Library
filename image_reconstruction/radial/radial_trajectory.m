@@ -55,8 +55,8 @@ else
     traj=reshape(traj,[3 kdim([1:3 5:end])]);
     
     % Split in channels
-    traj(2,:)=imag(traj(1,:));
-    traj(1,:)=real(traj(1,:));
+    traj(2,:)=real(traj(1,:));
+    traj(1,:)=imag(traj(1,:));
     
     % Simple z for stack-of-stars (linear increment)
     if kdim(3) > 1
@@ -71,5 +71,6 @@ else
     end
 end
 
+disp('+Radial analytical trajectory is calculated.')
 % END
 end

@@ -3,6 +3,8 @@
 clear all;close all;clc
 datapath1='../Data/SOS_GA/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
 datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
+datapath3='/home/tbruijne/Documents/Data/SOS_GA_LUNG/ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
+
 %% Readers & Writers
 % Get k-space data from lab/raw
 kdata=reader_reconframe_lab_raw(datapath1);
@@ -38,37 +40,31 @@ MR.Data=radial_phase_correction_zero(MR.Data);
 F2D=FG2D(traj,[kdim(1:2) 1]);
 
 % Do the Fessler gridding
-tic
 for z=1:size(MR.Data,3)
     for c=1:size(MR.Data,4)
         Fessler2D(:,:,z,c)=F2D'*(MR.Data(:,:,z,c).*dcf);
     end    
 end
-toc
 close all;figure,imshow3(abs(Fessler2D(:,:,5:28,1)),[],[4 6])
 
 % Do the Greengard gridding
 G2D=GG2D(traj,[kdim(1:2) 1]);
 
 % Do the Greengard gridding
-tic
 for z=1:size(MR.Data,3)
     for c=1:size(MR.Data,4)
         Greengard2D(:,:,z,c)=G2D'*(MR.Data(:,:,z,c).*dcf);
     end    
 end
-toc
 figure,imshow3(abs(Greengard2D(:,:,5:28,1)),[],[4 6])
 
 % Do the Flat Iron gridding
 FF2D=FI2D(traj,[kdim(1:2) 1]);
-tic
 for z=1:size(MR.Data,3)
     for c=1:size(MR.Data,4)
         FlatIron2D(:,:,z,c)=FF2D'*(MR.Data(:,:,z,c).*dcf);
     end    
 end
-toc
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
 %% NUFFT toolboxes 3D
@@ -82,29 +78,23 @@ MR.Data=radial_phase_correction_model(MR.Data,traj);
 
 % Initialize Fessler 3D nufft operator
 F3D=FG3D(traj,[kdim(1:3) 1]);
-tic
 for c=1:1%size(MR.Data,4)
     Fessler3D(:,:,:,c)=F3D'*(MR.Data(:,:,:,c).*dcf);
 end
-toc
 close all;figure,imshow3(abs(Fessler3D(:,:,5:28,1)),[],[4 6])
 
 % 3D Greengard gridding
 G3D=GG3D(traj,[kdim(1:3) 1]);
-tic
 for c=1:1%size(MR.Data,4)
     Greengard3D(:,:,:,c)=G3D'*(MR.Data(:,:,:,c).*dcf);
 end
-toc
 figure,imshow3(abs(Greengard3D(:,:,5:28,1)),[],[4 6])
 
 % 3D FlatIron grdding
 FF3D=FI3D(traj,[kdim(1:3) 1]);
-tic
 for c=1:1%size(MR.Data,4)
     FlatIron3D(:,:,:,c)=FF3D'*(MR.Data(:,:,:,c).*dcf);
 end
-toc
 figure,imshow3(abs(FlatIron3D(:,:,5:28,1)),[],[4 6])
 
 %% Coil sensitivity map estimation (espirit and openadapt)
@@ -340,7 +330,7 @@ for z=1:size(kspace_data,3)
     [compressed_sense(:,:,z),~]=configure_compressed_sense(par);   
 end
 
-%% Real-time 3D L1 TV compressed sense
+%% Real-time 3D L1 TV compressed sense -- matlab implementation
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
 [noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
@@ -440,7 +430,7 @@ img=F2D'*(kspace_data.*repmat(dcf,[1 1 1 kdim(4) 1]));
 img=sum(abs(img),4);
 close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
 
-%% Design my own coil compression function
+%% Coil compression using BART
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
 [noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
@@ -458,3 +448,93 @@ F2D=FG2D(traj,kdim);
 img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
 img=sum(abs(img),4);
 %close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+
+%% Reconframe radial phase correction
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+kdim=size(kspace_data);
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_reconframe(kspace_data,1);
+F2D=FG2D(traj,kdim);
+img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+img=sum(abs(img),4);
+figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+
+%% 2D L1-espirit using BART with wavelet regularization
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=c12d(size(kspace_data));
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data); 
+
+% Coil compression
+nCh=6;
+kspace_data=coil_compression(kspace_data,nCh);
+kdim=c12d(size(kspace_data));
+
+% Estimate csm
+lr=5; % 5 times lower resolution
+mask=radial_lowres_mask(kdim(1:2),lr);
+F2D=FG2D(traj,kdim);
+lowres=F2D'*(kspace_data.*repmat(dcf.*mask,[1 1 kdim(3) kdim(4)]));
+csm=espirit(lowres,'bart');
+
+% Undersample
+R=4;
+[kspace_data2,traj2,dcf2]=radial_goldenangle_undersample(R,kspace_data,traj,dcf,'tom');
+
+% Create data struct to use for bart
+par.TV=[0.002 0.002 0 0 0]; % lambdas in dimensions 
+par.wavelet=0.005;
+par.traj=traj2;
+par.iter=100;
+for z=1:size(kspace_data,3)
+    par.kspace_data=kspace_data2(:,:,z,:,:,:,:,:,:,:);
+    par.csm=csm(:,:,z,:);  
+    compressed_sense(:,:,z)=configure_compressed_sense(par,'bart');   
+end
+
+%% 4D respitary resolved reconstruction with coil compression
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath3);
+[noise_data,~]=reader_reconframe_lab_raw(datapath3,5,1);
+kspace_data=noise_prewhitening(kspace_data,noise_data);
+kdim=c12d(size(kspace_data));
+traj=radial_trajectory(kdim(1:2),1);
+dcf=radial_density(traj);
+kspace_data=ifft(kspace_data,[],3);
+kspace_data=radial_phase_correction_zero(kspace_data); 
+
+% Respiratory binning
+n_phases=10;
+respiration=radial_3D_estimate_motion(kspace_data);
+respiratory_bin_idx=respiratory_binning(respiration,n_phases);
+[kspace_data,traj,dcf]=respiratory_data_transform(kspace_data,traj,dcf,respiratory_bin_idx,n_phases);
+
+% Create data struct to use for bart
+par.TV=[0.001 0.001 0 0 0.01]; % lambdas in dimensions 
+par.wavelet=0.005;
+par.traj=traj;
+par.iter=200;
+for z=1:size(kspace_data,3)
+    
+    % Coil compression
+    nCh=8;
+    par.kspace_data=coil_compression(kspace_data(:,:,z,:,:),nCh);
+    kdim=c12d(size(par.kspace_data));
+    
+    % Estimate csm
+    lr=5; % 5 times lower resolution
+    mask=radial_lowres_mask(kdim(1:2),lr);
+    F2D=FG2D(traj,kdim);
+    lowres=F2D'*(par.kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
+    csm=espirit(lowres,'bart');
+
+
+    par.kspace_data=kspace_data(:,:,z,:,:,:,:,:,:,:);
+    par.csm=csm(:,:,z,:);  
+    compressed_sense(:,:,z)=configure_compressed_sense(par,'bart');   
+end

@@ -45,5 +45,7 @@ fi.nj=numel(fi.k(1,:,:,:,1));
 % Define seperate class
 fi=class(fi,'FI3D');
 
+disp('+2D FlatIron gridder operator initialized.')
+
 %END
 end

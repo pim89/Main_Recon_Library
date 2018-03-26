@@ -43,7 +43,7 @@ for loc=1:kdim(8)  % Mixes
 for ech=1:kdim(7)  % Phases
 for ph=1:kdim(6)   % Echos
 for dyn=1:kdim(5)  % Dynamics
-    om=[fg.k(2,:,:,:,:,dyn,ph,ech,loc,mix,ex1,ex2,avg); fg.k(1,:,:,:,:,dyn,ph,ech,loc,mix,ex1,ex2,avg)]'*pi;
+    om=[fg.k(1,:,:,:,:,dyn,ph,ech,loc,mix,ex1,ex2,avg); fg.k(2,:,:,:,:,dyn,ph,ech,loc,mix,ex1,ex2,avg)]'*pi;
     fg.st{dyn,ph,ech,loc,mix,ex1,ex2,avg} = nufft_init(om, Nd, Jd, Gd, n_shift,'minmax:tuned');
 end % Dynamics
 end % Echos
@@ -60,6 +60,7 @@ fg.adjoint=0;
 fg.mode=2;   % 2= complex image
 fg=class(fg,'FG2D');
 
+disp('+2D Fessler gridder operator initialized.')
 % end
 end
 

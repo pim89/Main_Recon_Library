@@ -43,7 +43,7 @@ end
 cph_pre=mean(matrix_to_vec(var(angle(kspace_data(cp,:,:)),[],2)));
 kspace_data=kspace_data.*phase_error_mtx;
 cph_post=mean(matrix_to_vec(var(angle(kspace_data(cp,:,:)),[],2)));
-disp(['>> Mean variance of k0 phase changed from: ',num2str(cph_pre),' -> ',num2str(cph_post)])
-
+disp('+Radial girf based phase correction.')
+disp(['     Mean variance of k0 phase changed from: ',num2str(cph_pre),' -> ',num2str(cph_post)])
 % END
 end

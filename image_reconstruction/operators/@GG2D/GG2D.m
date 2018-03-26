@@ -45,5 +45,7 @@ gg.k=-1*double(reshape(gg.k,[3 gg.kdim(1)*gg.kdim(2) 1 1 gg.kdim(5:end)]));
 % Define seperate class
 gg=class(gg,'GG2D');
 
+disp('+2D Greengard gridder operator initialized.')
+
 %END
 end

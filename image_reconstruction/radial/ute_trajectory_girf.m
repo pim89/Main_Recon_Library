@@ -41,8 +41,8 @@ end
 
 % Loop over partitions 
 for p=1:prod(kdim(4:end))
-    traj(1,:,:,:,p)=repmat(girf_k(:,1),[1 kdim(2) kdim(3)]).*repmat(cos(rad_ang),[kdim(1) 1 kdim(3)]);
-    traj(2,:,:,:,p)=repmat(girf_k(:,2),[1 kdim(2) kdim(3)]).*repmat(sin(rad_ang),[kdim(1) 1 kdim(3)]);
+    traj(1,:,:,:,p)=repmat(girf_k(:,1),[1 kdim(2) kdim(3)]).*repmat(sin(rad_ang),[kdim(1) 1 kdim(3)]);
+    traj(2,:,:,:,p)=repmat(girf_k(:,2),[1 kdim(2) kdim(3)]).*repmat(cos(rad_ang),[kdim(1) 1 kdim(3)]);
     traj(3,:,:,:,p)=repmat(girf_k(:,3),[1 kdim(2) kdim(3)]).*repmat(permute(kz,[1 3 2]),[kdim(1) kdim(2) 1]);
 end
 

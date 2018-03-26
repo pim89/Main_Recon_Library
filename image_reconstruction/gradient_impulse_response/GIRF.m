@@ -45,6 +45,7 @@ for ech=1:numel(adc);
     end
 end
 
+disp('+Gradient impulse response loaded and processed.')
 % Visualization
 if nargin > 2
     %adc{1}=(0.357:0.001:0.82)*10^-3;
@@ -71,6 +72,7 @@ if nargin > 2
     axis([time(1)*1E+03 time(end)*1E+03 -1000 1000]);set(gca,'LineWidth',2,'FontSize',14,'FontWeight','bold');    
     
     set(gcf,'Color','w')
+    drawnow;
 end
 % END
 end

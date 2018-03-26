@@ -9,5 +9,7 @@ res.S=csm;
 res.adjoint=1; % 1 = forward (multicoil --> single coil). -1 = inverse operator
 res=class(res,'SS');
 
+disp('+Sensitivity operator initialized.')
+
 %END
 end

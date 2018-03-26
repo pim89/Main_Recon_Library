@@ -1,8 +1,0 @@
-function kspace_data = coil_compression(kspace_data,nCh,varargin)
-%%Coil compression using the BART toolbox
-
-kspace_data=ksp_reconframe_to_bart(kspace_data);
-a=bart('cc -p 5',kspace_data);
-kspace_data=ksp_bart_to_reconframe(kspace_data);
-% END
-end

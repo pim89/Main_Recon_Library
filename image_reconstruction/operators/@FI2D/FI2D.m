@@ -44,5 +44,7 @@ fi.k=-1*double(reshape(fi.k,[3 fi.kdim(1)*fi.kdim(2) 1 1 fi.kdim(5:end)]));
 % Define seperate class
 fi=class(fi,'FI2D');
 
+disp('+2D FlatIron gridder operator initialized.')
+
 %END
 end

@@ -42,13 +42,13 @@ if gg.adjoint==-1 % NUFFT^(-1)
         if ~gg.parfor
             for coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
-                res_tmp(:,coil)=matrix_to_vec(nufft3d1(nj,k_tmp(2,:),k_tmp(1,:),k_tmp(3,:),...
+                res_tmp(:,coil)=matrix_to_vec(nufft3d1(nj,k_tmp(1,:),k_tmp(2,:),k_tmp(3,:),...
                     data_tmp(:,coil),1,eps,idim(1),idim(2),idim(3)))*sqrt(prod(idim(1:3)));
             end
         else
             parfor coil=1:kdim(4)
                 % Save in temporarily matrix, saves indexing time
-                res_tmp(:,coil)=matrix_to_vec(nufft3d1(nj,k_tmp(2,:),k_tmp(1,:),k_tmp(3,:),...
+                res_tmp(:,coil)=matrix_to_vec(nufft3d1(nj,k_tmp(1,:),k_tmp(2,:),k_tmp(3,:),...
                     data_tmp(:,coil),1,eps,idim(1),idim(2),idim(3)))*sqrt(prod(idim(1:3)));
             end                
         end
@@ -93,13 +93,13 @@ else
             if ~gg.parfor
                 for coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
-                    res_tmp(:,coil)=nufft2d2(nj,k_tmp(2,:),k_tmp(1,:),k_tmp(3,:),...
+                    res_tmp(:,coil)=nufft2d2(nj,k_tmp(1,:),k_tmp(2,:),k_tmp(3,:),...
                         1,eps,idim(1),idim(2),double(data_tmp(:,:,:,coil)))/sqrt(prod(idim(1:3)));
                 end
             else
                 for coil=1:kdim(4)
                     % Save in temporarily matrix, saves indexing time
-                    res_tmp(:,coil)=nufft2d2(nj,k_tmp(2,:),k_tmp(1,:),k_tmp(3,:),...
+                    res_tmp(:,coil)=nufft2d2(nj,k_tmp(1,:),k_tmp(2,:),k_tmp(3,:),...
                         1,eps,idim(1),idim(2),double(data_tmp(:,:,:,coil)))/sqrt(prod(idim(1:3)));
                 end
             end

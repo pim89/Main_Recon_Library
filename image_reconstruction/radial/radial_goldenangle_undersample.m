@@ -1,4 +1,4 @@
-function [kspace_data,traj,dcf] = radial_goldenangle_undersample(R,kspace_data,traj,dcf)
+function [kspace_data,traj,dcf] = radial_goldenangle_undersample(R,kspace_data,traj,dcf,varargin)
 %%Undersample golden angle radial k-space data, trajectory and dcf
 
 % Handle dimensions seperately for kspace_data, traj & dcf
@@ -33,6 +33,16 @@ dcf=reshape(dcf,[ddim(1) ddim(3) ddim(4) ddim(6:12) ddim(2) ddim(5)]);
 kspace_data=ipermute(kspace_data,[1 3 4 6 7 8 9 10 11 12 2 5]);
 traj=ipermute(traj,[1 2 4 6 7 8 9 10 11 12 3 5]);
 dcf=ipermute(dcf,[1 3 4 6 7 8 9 10 11 12 2 5]);
+
+% Clear last dimensions if required
+if ~isempty(varargin)
+    kspace_data=kspace_data(:,:,:,:,1,:,:,:,:,:,:);
+    traj=traj(:,:,:,:,1,:,:,:,:,:,:);
+    dcf=dcf(:,:,:,:,1,:,:,:,:,:,:);
+end
+
+kdim=size(kspace_data);
+disp(['+Data is undersampled to dimensions: ',num2str(kdim)])
 
 % END
 end
