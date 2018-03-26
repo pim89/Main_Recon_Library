@@ -1,0 +1,17 @@
+%% Windows BART installation guide
+1) Download Cygwin and install with the following packages (info From BART github):
+    Devel: gcc, make
+    Math: fftw3, fftw3-doc, libfftw3-devel, libfftw3_3
+    Math: liblapack-devel, liblapack-doc, liblapack0
+    Libs: libpng, libpng-devel
+2) Open cygwin terminal
+    >> export SHELLOPTS
+    >> set -o igncr
+3) Open the makefile and modify:
+    LAPACKA=1
+    MODE=Cygwin
+    >> make
+4) Go to bart-x.x.xx/matlab
+    Change ERR = system(['bash.exe .... to ERR = system(['C:\cygwin64\bin\bash.exe --login -c '
+
+    
