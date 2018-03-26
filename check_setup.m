@@ -14,9 +14,9 @@ try
 catch
     suc6=0;
     if isempty(which('bart'))
-        disp('>> BART toolbox is not added to the path');
+        disp('+ BART toolbox is not added to the path');
     else
-        disp('>> BART toolbox is not installed');
+        disp('+ BART toolbox is not installed');
     end
 end
 
@@ -27,9 +27,9 @@ try
 catch
     suc6=0;
     if isempty(which('nufft2d1')) || isempty(which('nufft3d1'))
-        disp('>> Greengard NUFFT toolbox not added to path');
+        disp('+ Greengard NUFFT toolbox not added to path');
     else
-        disp('>> Greengard NUFFT toolbox not compiled');
+        disp('+ Greengard NUFFT toolbox not compiled');
     end
 end
 
@@ -39,9 +39,9 @@ try
 catch
     suc6=0;
     if isempty(which('nufft2d1')) || isempty(which('nufft3d1'))
-        disp('>> Fessler NUFFT toolbox not added to path');
+        disp('+ Fessler NUFFT toolbox not added to path');
     else
-        disp('>> Fessler NUFFT toolbox not compiled');
+        disp('+ Fessler NUFFT toolbox not compiled');
     end
 end
 
@@ -51,9 +51,9 @@ try
 catch
     suc6=0;
     if isempty(which('MRecon'))
-        disp('>> Reconframe is not added to the path');
+        disp('+ Reconframe is not added to the path');
     else
-         disp('>> Reconframe is not installed/compiled');
+         disp('+ Reconframe is not installed/compiled');
     end
 end
 
@@ -63,14 +63,14 @@ try
 catch
     suc6=0;
     if isempty(which('sdc3_MAT'))
-        disp('>> Iterative DCF code is not added to the path');
+        disp('+ Iterative DCF code is not added to the path');
     else
-        disp('>> Iterative DCF code is not installed');
+        disp('+ Iterative DCF code is not installed');
     end
 end
 
 % Succesfull integration
 if suc6
-    disp('>> All toolboxes are succesfully installed and included to path')
+    disp('+ All toolboxes are succesfully installed and included to path')
 end
 
