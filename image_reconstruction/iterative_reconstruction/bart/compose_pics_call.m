@@ -19,13 +19,18 @@ if isfield(par,'TV')
 end
 
 % Change number of iterations
-if isfield(par,'iter')
-    pics_call=strcat(pics_call,[' -i',num2str(par.iter)]);
+if isfield(par,'Niter')
+    pics_call=strcat(pics_call,[' -i',num2str(par.Niter)]);
 end
 
 % Add trajectory 
 if isfield(par,'traj')
     pics_call=strcat(pics_call,' -t');
+end
+
+% Add mask for cartesian only! 
+if isfield(par,'mask')
+    pics_call=strcat(pics_call,' -p');
 end
 
 % END

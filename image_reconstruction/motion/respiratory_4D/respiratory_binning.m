@@ -19,5 +19,6 @@ par.sort_data='phase';
 % Perform the binning
 resp_bin_idx=sort_data_4D(par);
 
+disp(['+Data binned in ',num2str(n_phases),' respiratory phase.'])
 % END
 end

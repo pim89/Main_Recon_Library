@@ -168,7 +168,7 @@ int main_cc(int argc, char* argv[])
 		unmap_cfl(DIMS, out_dims, out_data);
 	}
 
-	printf("Done.\n");
+	//printf("Done.\n");
 	exit(0);
 }
 

@@ -7,12 +7,16 @@ if ~isempty(varargin)
 end
 
 % FFT image
-kimg=fftshift(fft(fftshift(fft2c(img),3),[],3),3);
+kimg=fft2c(img);
+if size(img,3)>1
+    kimg=fftshift(fft(ifftshift(kimg,3),[],3),3);
+end
 
 if isbart
     % m selects number of coil maps
     % t is threshold for background (not really, but effectively)
-    csm=bart('ecalib -t 0.0001 -m1',kimg); 
+    csm=bart('ecalib -t 0.0001 -m1',ksp_reconframe_to_bart(kimg)); 
+    csm=ksp_bart_to_reconframe(csm);
 else
     if numel(size(squeeze(img)))>3
         disp('>> 3D ESPIRiT is not supported in the matlab implementation.');
@@ -45,5 +49,7 @@ else
     % Only select largest eigenvalue and normalize
     csm=M(:,:,:,end).*repmat(W(:,:,end)>coff2,[1,1,nc]);
 end
+
+disp('+Coil maps estimaed using espirit')
 % END
 end

@@ -6,7 +6,11 @@ if dim(1)==3
     data=permute(data,[1 2 4 6:12 3 5]);
     data=reshape(data,[dim([1 2 4 6:12]) prod(dim([3 5])) 1]);
     res=permute(data,[1 2 11 3 12 4:10]);
-else
+elseif numel(data) < 15 % dimension array
+    data(2)=data(2)*data(5);
+    data(5)=1;
+    res=data;
+else    
     data=permute(data,[1 3 4 6:12 2 5]);
     data=reshape(data,[dim([1 3 4 6:12]) prod(dim([2 5])) 1]);
     res=permute(data,[1 11 2 3 12 4:10]);

@@ -36,16 +36,19 @@ Tested and supported features:
 	Added an UTE dataset to test the GIRFs
 	Coil compression using BART 
 	Radial phase correction using the reconframe method
+	BART support in windows
+	Singleton expansion operators for DCF in the example script
+	BART 4D PICS interface
 
 TODO:
 	NUFFT using BART
-	Iterative reconstructions using BART
 	Scale regularization parameters in reconstruction same in BART + matlab	
 	Fessler 3D NUFFT shift bug
 	Greengard 3D forward NUFFT operation seems to be bugged
-	Verbose arguments to all functions
 	BART radial trajectory add tiny golden angle
 	Iterative DCF estimation for 2D trajectories
+	FFT operators 
+	FFT based matlab iterative reconstructions
 
 
 

@@ -1,16 +1,16 @@
 %% Demonstration script
-% Note: for windows replace all "/" with "/" and vice versa.
+% Note: for windows replace all "\" with "\" and vice versa.
 clear all;close all;clc
-datapath1='../Data/SOS_GA/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
-datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
-datapath3='/home/tbruijne/Documents/Data/SOS_GA_LUNG/ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
+datapath1='..\Data\SOS_GA\bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
+datapath2='\nfs\bsc01\researchData\USER\tbruijne\MR_Data\Internal_data\Radial3D_data\U2\20170926_3D_Abdomen\Scan1\ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
+datapath3='\home\tbruijne\Documents\Data\SOS_GA_LUNG\ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
 
 %% Readers & Writers
-% Get k-space data from lab/raw
+% Get k-space data from lab\raw
 kdata=reader_reconframe_lab_raw(datapath1);
 
-% Get images from par/rec
-%images=reader_reconframe_par_rec('/local_scratch/tbruijne/WorkingData/4DLung/Scan2/ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
+% Get images from par\rec
+%images=reader_reconframe_par_rec('\local_scratch\tbruijne\WorkingData\4DLung\Scan2\ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
 
 % Extract PPE parameters (from reconframe object)
 [kdata,MR]=reader_reconframe_lab_raw(datapath1);
@@ -18,10 +18,10 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Write data to dicom
 %MR.Perform;
-%writeDicomFromMRecon(MR,MR.Data,'../Main_Recon_Library/');
+%writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
 
 %% NUFFT toolboxes 2D
-% Radial k-space trajectory (/./ not /../)
+% Radial k-space trajectory (\.\ not \..\)
 [~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
@@ -37,34 +37,20 @@ MR.Data=ifft(MR.Data,[],3);
 MR.Data=radial_phase_correction_zero(MR.Data);
 
 % Initialize Fessler 2D nufft operator
-F2D=FG2D(traj,[kdim(1:2) 1]);
+F2D=FG2D(traj,kdim);
 
 % Do the Fessler gridding
-for z=1:size(MR.Data,3)
-    for c=1:size(MR.Data,4)
-        Fessler2D(:,:,z,c)=F2D'*(MR.Data(:,:,z,c).*dcf);
-    end    
-end
+Fessler2D=F2D'*(bsxfun(@times,MR.Data,dcf));
 close all;figure,imshow3(abs(Fessler2D(:,:,5:28,1)),[],[4 6])
 
 % Do the Greengard gridding
-G2D=GG2D(traj,[kdim(1:2) 1]);
-
-% Do the Greengard gridding
-for z=1:size(MR.Data,3)
-    for c=1:size(MR.Data,4)
-        Greengard2D(:,:,z,c)=G2D'*(MR.Data(:,:,z,c).*dcf);
-    end    
-end
+G2D=GG2D(traj,kdim);
+Greengard2D=G2D'*(bsxfun(@times,MR.Data,dcf));
 figure,imshow3(abs(Greengard2D(:,:,5:28,1)),[],[4 6])
 
 % Do the Flat Iron gridding
-FF2D=FI2D(traj,[kdim(1:2) 1]);
-for z=1:size(MR.Data,3)
-    for c=1:size(MR.Data,4)
-        FlatIron2D(:,:,z,c)=FF2D'*(MR.Data(:,:,z,c).*dcf);
-    end    
-end
+FF2D=FI2D(traj,kdim);
+FlatIron2D=FF2D'*(bsxfun(@times,MR.Data,dcf));
 figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 
 %% NUFFT toolboxes 3D
@@ -165,7 +151,7 @@ soft_weights=mrriddle_respiratory_filter(respiration,recon_matrix_size);
 F2D=FG2D(traj,[kdim(1:2) 1]);
 for z=1:size(kspace_data,3)
     for c=1:size(kspace_data,4)
-        Fessler2D_SW(:,:,z,c)=F2D'*(kspace_data(:,:,z,c).*dcf.*repmat(soft_weights,[kdim(1) 1]));
+        Fessler2D_SW(:,:,z,c)=F2D'*(bsxfun(@times,kspace_data(:,:,z,c).*dcf,soft_weights));
     end    
 end
 close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
@@ -189,7 +175,7 @@ respiratory_bin_idx=respiratory_binning(respiration,n_phases);
 % Fourier transform on new matrices
 kdim=size(kspace_data);
 F2D=FG2D(traj,kdim);
-Recon_4D=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+Recon_4D=F2D'*(bsxfun(@times,kspace_data,dcf));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
@@ -214,8 +200,8 @@ for z=1:size(kspace_data,3)
 end
 
 % Show difference
-normal=normal/mean(abs(normal(:)));
-prew=prew/mean(abs(prew(:)));
+normal=normal\mean(abs(normal(:)));
+prew=prew\mean(abs(prew(:)));
 A=zeros(140,140,12);
 A(:,:,1:6)=normal(:,:,10:2:20,1);
 A(:,:,7:12)=prew(:,:,10:2:20,1);
@@ -250,7 +236,7 @@ kspace_data=radial_phase_correction_zero(kspace_data);
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,kdim);
-lowres=F2D'*(kspace_data.*repmat(dcf.*mask,[1 1 kdim(3) kdim(4)]));
+lowres=F2D'*(bsxfun(@times,kspace_data,dcf.*mask));
 csm=openadapt(lowres);
 
 % Initialize structure to send to the solver for 2D
@@ -281,7 +267,7 @@ kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zer
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:3),lr);
 F3D=FG3D(traj,kdim);
-lowres=F3D'*(kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
+lowres=F3D'*bsxfun(@times,kspace_data,dcf.*mask);
 csm=openadapt(lowres);
 
 clear par
@@ -312,7 +298,7 @@ kspace_data=radial_phase_correction_zero(kspace_data);
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,kdim);
-lowres=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4)]));
+lowres=F2D'*bsxfun(@times,kspace_data,dcf));
 csm=openadapt(lowres);
 
 %Initialize structure to send to the solver
@@ -343,7 +329,7 @@ kspace_data=radial_phase_correction_model(kspace_data,traj); % Cannot do the zer
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:3),lr);
 F3D=FG3D(traj,kdim);
-lowres=F3D'*(kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
+lowres=F3D'*bsxfun(@times,kspace_data,dcf);
 csm=openadapt(lowres);
 
 % Transform data dimensions to dynamics
@@ -394,12 +380,12 @@ kdim=size(kspace_data);
 
 % NUFFT
 F2D=FG2D(traj,kdim);
-img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+img=F2D'*bsxfun(@times,kspace_data,dcf);
 idim=size(img);
 S=SS(ones(idim(1:4))); % Sum of squares
 img=S*img;
 for t=1:idim(5)
-    img(:,:,:,:,t)=img(:,:,:,:,t)/max(matrix_to_vec(abs(img(:,:,:,:,t))));
+    img(:,:,:,:,t)=img(:,:,:,:,t)\max(matrix_to_vec(abs(img(:,:,:,:,t))));
 end
 close all;slicer(squeeze(img))
 
@@ -408,7 +394,7 @@ close all;slicer(squeeze(img))
 kspace_data=kspace_data{1};
 ppe_pars=reader_reconframe_ppe_pars(MR);
 kdim=size(kspace_data);
-pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_u2.mat';
+pathgirf='\nfs\bsc01\researchData\USER\tbruijne\Projects_Software\GIRFs\girf_u2.mat';
 
 % Get k-space trajectory per gradient (carefull its in cells)!
 [girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
@@ -426,7 +412,7 @@ kspace_data=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
 % Normal stuff
 kspace_data=ifft(kspace_data,[],3);
 F2D=FG2D(traj(:,:,:,16),kdim);
-img=F2D'*(kspace_data.*repmat(dcf,[1 1 1 kdim(4) 1]));
+img=F2D'*bsxfun(@times,kspace_data,dcf);
 img=sum(abs(img),4);
 close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
 
@@ -445,7 +431,7 @@ nCh=1;
 kspace_data=coil_compression(kspace_data,nCh);
 kdim=c12d(size(kspace_data));
 F2D=FG2D(traj,kdim);
-img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+img=F2D'*bsxfun(@times,kspace_data,dcf);
 img=sum(abs(img),4);
 %close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
@@ -457,7 +443,7 @@ dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
 kspace_data=radial_phase_correction_reconframe(kspace_data,1);
 F2D=FG2D(traj,kdim);
-img=F2D'*(kspace_data.*repmat(dcf,[1 1 kdim(3) kdim(4) 1]));
+img=F2D'*bsxfun(@times,kspace_data,dcf));
 img=sum(abs(img),4);
 figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
@@ -480,7 +466,7 @@ kdim=c12d(size(kspace_data));
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,kdim);
-lowres=F2D'*(kspace_data.*repmat(dcf.*mask,[1 1 kdim(3) kdim(4)]));
+lowres=F2D'*bsxfun(@times,kspace_data,dcf.*mask);
 csm=espirit(lowres,'bart');
 
 % Undersample
@@ -498,43 +484,67 @@ for z=1:size(kspace_data,3)
     compressed_sense(:,:,z)=configure_compressed_sense(par,'bart');   
 end
 
-%% 4D respitary resolved reconstruction with coil compression
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath3);
-[noise_data,~]=reader_reconframe_lab_raw(datapath3,5,1);
-kspace_data=noise_prewhitening(kspace_data,noise_data);
+%% 4D respiratory resolved reconstruction with coil compression and BART
+% Load phase corrected k-space data directly from directory
+load([get_data_dir(datapath1),'kspace_phase_corr.mat']);
 kdim=c12d(size(kspace_data));
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
-kspace_data=ifft(kspace_data,[],3);
-kspace_data=radial_phase_correction_zero(kspace_data); 
 
 % Respiratory binning
-n_phases=10;
+n_phases=4;
 respiration=radial_3D_estimate_motion(kspace_data);
 respiratory_bin_idx=respiratory_binning(respiration,n_phases);
 [kspace_data,traj,dcf]=respiratory_data_transform(kspace_data,traj,dcf,respiratory_bin_idx,n_phases);
 
-% Create data struct to use for bart
+% Create data struct to use for bart/nlcg
 par.TV=[0.001 0.001 0 0 0.01]; % lambdas in dimensions 
 par.wavelet=0.005;
 par.traj=traj;
-par.iter=200;
+par.Niter=100;
+  
 for z=1:size(kspace_data,3)
-    
-    % Coil compression
-    nCh=8;
-    par.kspace_data=coil_compression(kspace_data(:,:,z,:,:),nCh);
+    par.kspace_data=kspace_data(:,:,z,:,:);
     kdim=c12d(size(par.kspace_data));
     
-    % Estimate csm
-    lr=5; % 5 times lower resolution
-    mask=radial_lowres_mask(kdim(1:2),lr);
-    F2D=FG2D(traj,kdim);
-    lowres=F2D'*(par.kspace_data.*repmat(dcf.*mask,[1 1 1 kdim(4)]));
-    csm=espirit(lowres,'bart');
+    % Estimate csm using all the spokes
+    lr=5; 
+    mask=radial_lowres_mask([kdim(1:2) 1 1 kdim(5)],lr);
+    F2D=FG2D(dynamic_to_spokes(traj),dynamic_to_spokes(kdim));
+    lowres=F2D'*dynamic_to_spokes(bsxfun(@times,par.kspace_data,dcf.*mask));
+    par.csm=espirit(lowres,'bart');
 
+    % Iterative reconstructions
+    compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
+end
 
-    par.kspace_data=kspace_data(:,:,z,:,:,:,:,:,:,:);
-    par.csm=csm(:,:,z,:);  
-    compressed_sense(:,:,z)=configure_compressed_sense(par,'bart');   
+%% Provide support for Cartesian iterative reconstructions -- WIP
+% Generate Cartesian multi-channel kspace-data
+kspace_data=bart('phantom -s 4 -k -x 128 -3');
+kdim=c12d(size(kspace_data));
+
+% Create an undersampling mask
+mask=bart('poisson -Y 128 -Z 128 -y 3 -z 3 -C 25');
+
+% Fourier transform along readout
+kspace_data=bart('fft -i 7',kspace_data);
+
+% Setup iterative reconstruction struct
+par.TV=[0.001 0.001 0 0 0.01]; % lambdas in dimensions 
+par.wavelet=0.005;
+par.mask=mask;
+par.Niter=100;
+
+for z=1:kdim(3)
+    par.kspace_data=kspace_data(z,:,:,:,:);
+    kdim=c12d(size(par.kspace_data));
+    
+    % Estimate csm 
+    lr=5; 
+    zero_filled_kspace_data=cartesian_lowres_mask
+    lowres=bart('fft -i
+    par.csm=espirit(lowres,'bart');
+
+    % Iterative reconstructions
+    compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
 end

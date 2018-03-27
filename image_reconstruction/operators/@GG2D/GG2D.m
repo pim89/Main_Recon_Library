@@ -13,6 +13,10 @@ function  gg = GG2D(k,kdim)
 % Check input
 if numel(kdim)<12
     kdim(end+1:12)=1;
+    if kdim(3) > 1
+        disp('+ K-space dim(3) cannot be larger then 1 for 2D NUFFT.')
+        return
+    end
 end
 
 % Parfor options

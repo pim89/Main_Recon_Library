@@ -25,7 +25,6 @@ end
 
 % Read data
 MR=MRecon(loc);
-MR.Parameter.Parameter2Read.ky=MR.Parameter.Parameter2Read.ky(1:1000);
 MR=reconframe_read_sort_correct(MR,type);
 kspace_data=MR.Data;
 save([curdir,'kspace_data',num2str(type),'.mat'],'kspace_data');

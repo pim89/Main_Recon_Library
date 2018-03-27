@@ -66,7 +66,7 @@ if K_N == 2
 	end
 
 else
-	warning 'K_N not done'
+	%warning 'K_N not done'
 	alpha = 1;
 	beta = 0.5;
 	ok = true;
