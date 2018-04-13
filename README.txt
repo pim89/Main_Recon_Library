@@ -49,6 +49,7 @@ TODO:
 	Iterative DCF estimation for 2D trajectories
 	FFT operators 
 	FFT based matlab iterative reconstructions
+	MRFingerprinting reconstructies
 
 
 

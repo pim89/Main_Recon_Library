@@ -4,7 +4,7 @@ idim=c12d(size(data));
 
 if S.adjoint==1
     for p=1:prod(idim(5:end))
-        output(:,:,:,:,p)=sum(data(:,:,:,:,p).*conj(S.S),4)./sqrt(sum(abs(S.S).^2,4));
+        output(:,:,:,:,p)=sum(data(:,:,:,:,p).*conj(S.S),4);
     end
 else
     for p=1:prod(idim(5:end))

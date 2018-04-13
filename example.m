@@ -1,16 +1,16 @@
 %% Demonstration script
-% Note: for windows replace all "\" with "\" and vice versa.
+% Note: for windows replace all "/" with "/" and vice versa.
 clear all;close all;clc
-datapath1='..\Data\SOS_GA\bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
-datapath2='\nfs\bsc01\researchData\USER\tbruijne\MR_Data\Internal_data\Radial3D_data\U2\20170926_3D_Abdomen\Scan1\ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
-datapath3='\home\tbruijne\Documents\Data\SOS_GA_LUNG\ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
+datapath1='../Data/SOS_GA/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
+datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
+datapath3='/home/tbruijne/Documents/Data/SOS_GA_LUNG/ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
 
 %% Readers & Writers
-% Get k-space data from lab\raw
+% Get k-space data from lab/raw
 kdata=reader_reconframe_lab_raw(datapath1);
 
-% Get images from par\rec
-%images=reader_reconframe_par_rec('\local_scratch\tbruijne\WorkingData\4DLung\Scan2\ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
+% Get images from par/rec
+%images=reader_reconframe_par_rec('/local_scratch/tbruijne/WorkingData/4DLung/Scan2/ha_27112017_1534304_8_1_wip_t_t1_4d_tfeV4.rec');
 
 % Extract PPE parameters (from reconframe object)
 [kdata,MR]=reader_reconframe_lab_raw(datapath1);
@@ -18,10 +18,10 @@ ppe_pars=reader_reconframe_ppe_pars(MR);
 
 % Write data to dicom
 %MR.Perform;
-%writeDicomFromMRecon(MR,MR.Data,'..\Main_Recon_Library\');
+%writeDicomFromMRecon(MR,MR.Data,'../Main_Recon_Library/');
 
 %% NUFFT toolboxes 2D
-% Radial k-space trajectory (\.\ not \..\)
+% Radial k-space trajectory (/./ not /../)
 [~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
 ppe_pars=reader_reconframe_ppe_pars(MR);
@@ -200,8 +200,8 @@ for z=1:size(kspace_data,3)
 end
 
 % Show difference
-normal=normal\mean(abs(normal(:)));
-prew=prew\mean(abs(prew(:)));
+normal=normal/mean(abs(normal(:)));
+prew=prew/mean(abs(prew(:)));
 A=zeros(140,140,12);
 A(:,:,1:6)=normal(:,:,10:2:20,1);
 A(:,:,7:12)=prew(:,:,10:2:20,1);
@@ -385,7 +385,7 @@ idim=size(img);
 S=SS(ones(idim(1:4))); % Sum of squares
 img=S*img;
 for t=1:idim(5)
-    img(:,:,:,:,t)=img(:,:,:,:,t)\max(matrix_to_vec(abs(img(:,:,:,:,t))));
+    img(:,:,:,:,t)=img(:,:,:,:,t)/max(matrix_to_vec(abs(img(:,:,:,:,t))));
 end
 close all;slicer(squeeze(img))
 
@@ -394,7 +394,7 @@ close all;slicer(squeeze(img))
 kspace_data=kspace_data{1};
 ppe_pars=reader_reconframe_ppe_pars(MR);
 kdim=size(kspace_data);
-pathgirf='\nfs\bsc01\researchData\USER\tbruijne\Projects_Software\GIRFs\girf_u2.mat';
+pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_u2.mat';
 
 % Get k-space trajectory per gradient (carefull its in cells)!
 [girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
@@ -443,7 +443,7 @@ dcf=radial_density(traj);
 kspace_data=ifft(kspace_data,[],3);
 kspace_data=radial_phase_correction_reconframe(kspace_data,1);
 F2D=FG2D(traj,kdim);
-img=F2D'*bsxfun(@times,kspace_data,dcf));
+img=F2D'*bsxfun(@times,kspace_data,dcf);
 img=sum(abs(img),4);
 figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
