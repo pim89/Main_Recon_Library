@@ -16,12 +16,12 @@ figure
 for j=1:size(img,3);
     imshow(img(:,:,j),clips,'InitialMagnification',300);  
     if counter
-        annotation('textbox',[0.02 0.1 1 0],'string',['t: ',num2str(varargin{1}(j),'%d'),' s'],...
-            'Color','w','FontSize',28,'FontWeight','bold','LineStyle','none');
+        annotation('textbox',[0.02 0.12 1 0],'string',['t: ',num2str(varargin{1}(j),'%d'),' s'],...
+            'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
         
         if numel(varargin)>1
-            annotation('textbox',[0.55 0.1 1 0],'string',['r: ',num2str(varargin{2}(j),'%.1f'),' mm'],...
-                'Color','w','FontSize',28,'FontWeight','bold','LineStyle','none');
+            annotation('textbox',[0.6 0.12 1 0],'string',['r: ',num2str(varargin{2}(j),'%.1f'),' mm'],...
+                'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
         end
     end
 

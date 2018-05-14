@@ -1,7 +1,7 @@
 function pics_call = compose_pics_call(par)
 %% Function to compose the pics call
 
-pics_call='pics -S -d5 -u20   ';
+pics_call='pics -l1 -S -d5   ';
 
 % Wavelet regularization
 if isfield(par,'wavelet')

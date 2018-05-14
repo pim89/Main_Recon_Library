@@ -8,17 +8,17 @@ if ~isempty(varargin)
 end
 
 if isbart
-    params=check_compressed_sense_input(params,'bart');
+    check_compressed_sense_input(params,'bart');
     pics_call=compose_pics_call(params); 
     
     % Non-cartesian case
-    if ~isfield(par,'mask')
+    if ~isfield(params,'mask')
         res=bart(pics_call,ktraj_reconframe_to_bart(.5*params.traj),...  % .5 required vs normal nufft
             ksp_reconframe_to_bart(params.kspace_data),...
             params.csm);
     else % Cartesian case
         res=bart(pics_call,params.mask,...  
-            ksp_reconframe_to_bart(params.kspace_data),...
+            params.kspace_data,...
             params.csm);
     end
     res=isp_bart_to_reconframe(res);

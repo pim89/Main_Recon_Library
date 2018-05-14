@@ -15,7 +15,7 @@ end
 if isbart
     % m selects number of coil maps
     % t is threshold for background (not really, but effectively)
-    csm=bart('ecalib -t 0.0001 -m1',ksp_reconframe_to_bart(kimg)); 
+    csm=bart('ecalib -t 0.0001 -m1',ksp_reconframe_to_bart(kimg));
     csm=ksp_bart_to_reconframe(csm);
 else
     if numel(size(squeeze(img)))>3

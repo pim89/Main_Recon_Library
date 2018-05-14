@@ -38,7 +38,7 @@ for j=1:size(cimg,3);
 end
 
 % Create coronal gif
-cimg=imresize(rot90(abs(squeeze(img(varargin{1}(2),:,:,:,:))),1),[2*dims(3) dims(1)]);figure,imshow(cimg(:,:,1),[])
+cimg=imresize(rot90(abs(squeeze(img(varargin{1}(2),:,:,:,:))),1),[varargin{2}*dims(3) dims(1)]);figure,imshow(cimg(:,:,1),[])
 cfname=strcat(filename,'COR.gif');
 
 for j=1:size(cimg,3);
@@ -62,7 +62,7 @@ for j=1:size(cimg,3);
 end
 
 % Create sagittal gif
-cimg=imresize(rot90(abs(squeeze(img(:,varargin{1}(3),:,:,:))),1),[2*dims(3) dims(1)]);figure,imshow(cimg(:,:,1),[])
+cimg=imresize(rot90(abs(squeeze(img(:,varargin{1}(3),:,:,:))),1),[varargin{2}*dims(3) dims(1)]);figure,imshow(cimg(:,:,1),[])
 cfname=strcat(filename,'SAG.gif');
 
 for j=1:size(cimg,3);

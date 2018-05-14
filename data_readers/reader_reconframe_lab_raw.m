@@ -13,19 +13,26 @@ else
     type=varargin{1};
 end
 
-% Check if k-space exist already, then load from dir
+% Noise navigator addition
 if numel(varargin)>1
-    if exist([curdir,'kspace_data',num2str(type),'.mat']) > 0
-        load([curdir,'kspace_data',num2str(type),'.mat']);
-        disp(['>> Loaded K-space data from ',curdir,'kspace_data',num2str(type),'.mat'])
-        MR=[]; % Cant save reconframe object
-        return;
-    end
+    noise_navigator=1;
+else
+    noise_navigator=0;
 end
+
+% Check if k-space exist already, then load from dir
+% if numel(varargin)>1
+%     if exist([curdir,'kspace_data',num2str(type),'.mat']) > 0
+%         load([curdir,'kspace_data',num2str(type),'.mat']);
+%         disp(['>> Loaded K-space data from ',curdir,'kspace_data',num2str(type),'.mat'])
+%         MR=[]; % Cant save reconframe object
+%         return;
+%     end
+% end
 
 % Read data
 MR=MRecon(loc);
-MR=reconframe_read_sort_correct(MR,type);
+MR=reconframe_read_sort_correct(MR,type,noise_navigator);
 kspace_data=MR.Data;
 save([curdir,'kspace_data',num2str(type),'.mat'],'kspace_data');
 
