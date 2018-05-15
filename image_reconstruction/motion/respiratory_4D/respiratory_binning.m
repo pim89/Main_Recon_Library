@@ -14,7 +14,6 @@ end
 % Create struct to feed to Bjorns binning code
 par.respiration=respiration;
 par.resp_phases=n_phases;
-par.sort_data='phase';
 
 % Perform the binning
 resp_bin_idx=sort_data_4D(par);

@@ -36,7 +36,7 @@ chron_data = reshape(chron_data, [acq_samp, nChan, nKl]);
 
 %% Calculate noise only part
 % the data is zero centered and it is assumed there is no MR signal 36 cm away from isocenter
-noise_samp = floor(0.5 * (1.2 * acq_samp - (720 / acq_vox_size(1) ) ) );  % 2 * for radial sampling?
+noise_samp = floor(0.5 * (2 * acq_samp - (720 / acq_vox_size(1) ) ) );  % 2 * for radial sampling?
 indNoise = [1:noise_samp, (acq_samp - noise_samp + 1):acq_samp];
 
 %% Calculate noise variance

@@ -133,7 +133,7 @@ for c=1:1%size(MR.Data,4)
 end
 
 %% Estimate respiratory signal from multi-channel k-space data + motion weighted reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -157,7 +157,7 @@ end
 close all;figure,imshow3(abs(Fessler2D_SW(:,:,5:28,1)),[],[4 6])
 
 %% 4D (x,y,z,resp) reconstruction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -167,7 +167,7 @@ respiration=radial_3D_estimate_motion(kspace_data);
 
 % Define number of phases and do phase-binning
 n_phases=4;
-respiratory_bin_idx=respiratory_binning(respiration,n_phases);
+respiratory_bin_idx=respiratory_binning(respiration,n_phases,'amplitude');
 
 % Use the binning to transform the data matrices
 [kspace_data,traj,dcf]=respiratory_data_transform(kspace_data,traj,dcf,respiratory_bin_idx,n_phases);
@@ -179,8 +179,8 @@ Recon_4D=F2D'*(bsxfun(@times,kspace_data,dcf));
 slicer(squeeze(Recon_4D(:,:,19,:,:)))
 
 %% Noise prewhitening 
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 
 % Prewhitenen noise and do recons for both cases
 kspace_data_prew=noise_prewhitening(kspace_data,noise_data);
@@ -208,7 +208,7 @@ A(:,:,7:12)=prew(:,:,10:2:20,1);
 figure,imshow3(abs(A),[0 30],[2 6])
 
 %% Fitting radial phase correction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -223,8 +223,8 @@ end
 close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
 %% 2D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -248,15 +248,15 @@ par.W=DCF(sqrt(dcf));
 par.TV=TV_sparse(par.idim,[1 1 0 0 0],[10 10 0 0 0]);
 
 % Loop over slices and do itSense
-for z=1:size(kspace_data,3)
+for z=15:15%1:size(kspace_data,3)
     par.y=par.W*kspace_data(:,:,z,:,:,:,:,:,:,:,:);
     par.S=SS(csm(:,:,z,:));  
     [itsense(:,:,z),~]=configure_regularized_iterative_sense(par);    
 end
 
 %% 3D Iterative sense least squares (L2+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -285,8 +285,8 @@ par.S=SS(csm);
 [itsense,~]=configure_regularized_iterative_sense(par);    
 
 %% L1 iterative TV sense (L1+TV) -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -298,10 +298,10 @@ kspace_data=radial_phase_correction_zero(kspace_data);
 lr=5; % 5 times lower resolution
 mask=radial_lowres_mask(kdim(1:2),lr);
 F2D=FG2D(traj,kdim);
-lowres=F2D'*bsxfun(@times,kspace_data,dcf));
+lowres=F2D'*bsxfun(@times,kspace_data,dcf);
 csm=openadapt(lowres);
 
-%Initialize structure to send to the solver
+%Initialize structure to send to the solverreader_reconframe_lab_raw
 par.kdim=c12d([kdim(1:2) 1 kdim(4)]);
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=1;
@@ -310,15 +310,15 @@ par.W=DCF(sqrt(dcf));
 par.TV=TV_sparse(par.idim,[1 1 0 0 0],[0 0 0 0 0]);
 par.beta=.2; % step-size of CG
 
-for z=1:size(kspace_data,3)
+for z=15:15%1:size(kspace_data,3)
     par.y=par.W*kspace_data(:,:,z,:,:,:,:,:,:,:,:);
     par.S=SS(csm(:,:,z,:));  
     [compressed_sense(:,:,z),~]=configure_compressed_sense(par);   
 end
 
 %% Real-time 3D L1 TV compressed sense -- matlab implementation
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:3),1);
@@ -357,8 +357,8 @@ compressed_sense=configure_compressed_sense(par);
 figure,imshow3(abs(compressed_sense(:,:,5:28,1,1)),[],[4 6])
 
 %% View sharing operation, can be in any dimensions
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -417,8 +417,8 @@ img=sum(abs(img),4);
 close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
 
 %% Coil compression using BART
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -433,10 +433,10 @@ kdim=c12d(size(kspace_data));
 F2D=FG2D(traj,kdim);
 img=F2D'*bsxfun(@times,kspace_data,dcf);
 img=sum(abs(img),4);
-%close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
+close all;figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
 %% Reconframe radial phase correction
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
@@ -448,8 +448,8 @@ img=sum(abs(img),4);
 figure,imshow3(abs(img(:,:,5:28,1)),[],[4 6])
 
 %% 2D L1-espirit using BART with wavelet regularization
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5,1);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
+[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=c12d(size(kspace_data));
 traj=radial_trajectory(kdim(1:2),1);
@@ -458,9 +458,9 @@ kspace_data=ifft(kspace_data,[],3);
 kspace_data=radial_phase_correction_zero(kspace_data); 
 
 % Coil compression
-nCh=6;
-kspace_data=coil_compression(kspace_data,nCh);
-kdim=c12d(size(kspace_data));
+% nCh=6;
+% kspace_data=coil_compression(kspace_data,nCh);
+% kdim=c12d(size(kspace_data));
 
 % Estimate csm
 lr=5; % 5 times lower resolution
@@ -478,7 +478,7 @@ par.TV=[0.002 0.002 0 0 0]; % lambdas in dimensions
 par.wavelet=0.005;
 par.traj=traj2;
 par.iter=100;
-for z=1:size(kspace_data,3)
+for z=15:15%1:size(kspace_data,3)
     par.kspace_data=kspace_data2(:,:,z,:,:,:,:,:,:,:);
     par.csm=csm(:,:,z,:);  
     compressed_sense(:,:,z)=configure_compressed_sense(par,'bart');   
@@ -503,7 +503,7 @@ par.wavelet=0.005;
 par.traj=traj;
 par.Niter=100;
   
-for z=1:size(kspace_data,3)
+for z=15:15%1:size(kspace_data,3)
     par.kspace_data=kspace_data(:,:,z,:,:);
     kdim=c12d(size(par.kspace_data));
     
@@ -535,16 +535,16 @@ par.wavelet=0.005;
 par.mask=mask;
 par.Niter=100;
 
-for z=1:kdim(3)
-    par.kspace_data=kspace_data(z,:,:,:,:);
-    kdim=c12d(size(par.kspace_data));
-    
-    % Estimate csm 
-    lr=5; 
-    zero_filled_kspace_data=cartesian_lowres_mask
-    lowres=bart('fft -i
-    par.csm=espirit(lowres,'bart');
-
-    % Iterative reconstructions
-    compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
-end
+% for z=1:kdim(3)
+%     par.kspace_data=kspace_data(z,:,:,:,:);
+%     kdim=c12d(size(par.kspace_data));
+%     
+%     % Estimate csm 
+%     lr=5; 
+%     zero_filled_kspace_data=cartesian_lowres_mask
+%     lowres=bart('fft -i
+%     par.csm=espirit(lowres,'bart');
+% 
+%     % Iterative reconstructions
+%     compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
+% end
