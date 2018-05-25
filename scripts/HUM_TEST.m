@@ -181,28 +181,32 @@ traj=1.25*radial_trajectory(kdim(1:2),1);
 dcf=radial_density(traj);
 
 % Initialize Fessler 2D nufft operator
-F2D=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
+%F2D=FG2D(traj,[kdim(1:2) 1 kdim(4)]);
+F2D=FG2D(traj,kdim);
+
 
 % Do the Fessler gridding
 z=16;
-recon=single(flip(flip(F2D'*(bsxfun(@times,MR.Data(:,:,z,:,:),dcf)),1),3));
+%recon=single(flip(flip(F2D'*(bsxfun(@times,MR.Data(:,:,z,:,:),dcf)),1),3));
+recon=single(flip(flip(F2D'*(bsxfun(@times,MR.Data,dcf)),1),3));
+
 
 % Tune-able stuff for HUM
 sigmag=35;
 
 % HUM - I need a smarter masking algorithm
 recon_sos=squeeze(sos(recon,4));
-[recon_sos_hum,mask_sos,bias_sos]=hum(recon_sos);
+[recon_sos_hum,mask_sos,bias_sos]=hum3D(recon_sos);
 
 tic
 csm_espirit=espirit(recon,'bart');
 toc
 recon_espirit=sum(recon.*conj(csm_espirit),4);
-[recon_espirit_hum,mask_espirit,bias_espirit]=hum(abs(recon_espirit));
+[recon_espirit_hum,mask_espirit,bias_espirit]=hum3D(abs(recon_espirit));
 
 csm_walsh=openadapt(recon);
 recon_walsh=sum(recon.*conj(csm_walsh),4);
-[recon_walsh_hum,mask_walsh,bias_walsh]=hum(abs(recon_walsh));
+[recon_walsh_hum,mask_walsh,bias_walsh]=hum3D(abs(recon_walsh));
 
 cfac=1.2;
 figure,imshow3(cfac*cat(3,demax(recon_sos),demax(recon_sos_hum.*mask_sos),demax(bias_sos),...

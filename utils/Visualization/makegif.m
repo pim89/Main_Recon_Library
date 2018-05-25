@@ -14,7 +14,7 @@ img=squeeze(img);
 
 figure
 for j=1:size(img,3);
-    imshow(img(:,:,j),clips,'InitialMagnification',300);  
+    imshow(img(:,:,j),clips,'InitialMagnification',300);colormap jet;colorbar
     if counter
         annotation('textbox',[0.02 0.12 1 0],'string',['t: ',num2str(varargin{1}(j),'%d'),' s'],...
             'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
@@ -26,7 +26,7 @@ for j=1:size(img,3);
     end
 
     set(gcf,'Color','k');
-    pause(.2);
+    pause(.1);
     A = getframe();
     im=frame2im(A);
     [A,map]=rgb2ind(im,256);

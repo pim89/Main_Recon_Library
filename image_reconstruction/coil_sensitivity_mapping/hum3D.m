@@ -27,6 +27,7 @@ if nargin < 3
 
     bw_img=imdilate(bw_img,se);
     bw_img=imdilate(bw_img,se);
+    bw_img=imdilate(bw_img,se);
     bw_img=imfill(bw_img,'holes');
     bw_img=imerode(bw_img,se);
     bw_img=imerode(bw_img,se);
@@ -59,5 +60,5 @@ noise_mask=~mask;
 m_w=mean(img(mask));
 img(noise_mask)=m_w;
 bias=imgaussfilt3(img,sigmag);
-img_filt=img./bias;
+img_filt=mask.*(img./bias);
 end

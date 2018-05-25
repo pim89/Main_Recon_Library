@@ -68,7 +68,7 @@ end
 %dicomwrite cannot handle single, so use signed int16
 %this will pose an issue with data that has a small range however. 
 %can use a scalingfactor, but how to determine? 
-imagevolume=(flip(abs(imagevolume),3));
+imagevolume=abs(imagevolume);
 imagevolume=3276.7 * (imagevolume/max(imagevolume(:)));
 scalingfactor=10;
 imagevolume = int16(imagevolume * scalingfactor);
