@@ -19,7 +19,7 @@ end
 gg.parfor=0;
 	
 % Image space dimensions
-gg.idim(1:2)=ceil(max(abs(k(1,:))));
+gg.idim(1:2)=ceil(max(abs(matrix_to_vec(k([1 2],:)))));
 gg.idim(3)=ceil(max(abs(k(3,:))));
 if gg.idim(3)==0; gg.idim(3)=1;end
 gg.idim=[gg.idim kdim(4:end)];

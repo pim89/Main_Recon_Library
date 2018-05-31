@@ -11,7 +11,7 @@ end
 fg.parfor=0;
 
 % Image space dimensions
-fg.idim(1:2)=ceil(max(abs(k(1,:))));
+fg.idim(1:2)=ceil(max(abs(matrix_to_vec(k([1 2],:)))));
 fg.idim(3)=round(2*max(abs(k(3,:))));
 fg.idim=[fg.idim kdim(4:end)];
 

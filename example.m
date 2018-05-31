@@ -1,7 +1,7 @@
 %% Demonstration script
 % Note: for windows replace all "/" with "/" and vice versa.
 clear all;close all;clc
-datapath1='../Data/SOS_GA/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
+datapath1='/local_scratch2/tbruijne/WorkingData/4DGA/Scan2/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
 datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
 datapath3='/home/tbruijne/Documents/Data/SOS_GA_LUNG/ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
 

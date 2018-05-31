@@ -20,7 +20,7 @@ fi.parfor=0;
 fi.adjoint=1; 			
 
 % Image space dimensions
-fi.idim(1:2)=ceil(max(abs(k(1,:))));
+fi.idim(1:2)=ceil(max(abs(matrix_to_vec(k([1 2],:)))));
 fi.idim(3)=round(2*max(abs(k(3,:))));
 fi.idim=[fi.idim kdim(4:end)];
 
