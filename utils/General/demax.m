@@ -1,5 +1,5 @@
 function res = demax(x)
 
-res=squeeze(x/max(abs(x(:))));
+res=(x/max(abs(x(:))));
 
 end

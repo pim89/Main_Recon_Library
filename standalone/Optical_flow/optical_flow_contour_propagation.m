@@ -88,7 +88,7 @@ for dyn = 1:no_dyn
   RTTrackerWrapper(Iref, I);
   
   % Apply the estimated motion on the current image
-  f_img(:,:,:,dyn) = RTTrackerWrapper(mask);
+  f_img(:,:,:,dyn) = RTTrackerWrapper(flipud(mask));
   
   % Get the estimated motion field
   dvf(:,:,:,:,dyn) = RTTrackerWrapper();
