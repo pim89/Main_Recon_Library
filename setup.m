@@ -5,7 +5,7 @@ if ispc
 % windows
     addpath(genpath('C:\cygwin64\bin\'))
     addpath(genpath('C:\cygwin64\home\tombruijnen\BART\'))
-    addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\Recon_Library\Main_Recon_Library\'))
+    addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\RECON_MAIN\Main_Recon_Library'))
     addpath(fullfile('C:\cygwin64\home\tombruijnen\BART\','matlab'));
     setenv('TOOLBOX_PATH','C:\cygwin64\home\tombruijnen\BART\');
 else

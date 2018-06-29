@@ -14,7 +14,7 @@ img=squeeze(img);
 
 figure
 for j=1:size(img,3);
-    imshow(img(:,:,j),clips,'InitialMagnification',300);colormap jet;colorbar
+    imshow(img(:,:,j),clips,'InitialMagnification',300);
     if counter
         annotation('textbox',[0.02 0.12 1 0],'string',['t: ',num2str(varargin{1}(j),'%d'),' s'],...
             'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');

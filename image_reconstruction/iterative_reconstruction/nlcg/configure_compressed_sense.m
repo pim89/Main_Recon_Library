@@ -30,8 +30,10 @@ else
     dscale=100/norm(abs(params.y(:)));
     
     % Nonlinear conjugate gradient
-    x0=params.S*(params.N'*(params.W*params.y));
-    [res,cost]=nlcg(x0,params);
+    res=params.S*(params.N'*(params.W*(params.PH'*params.y)));
+    for n=1:3
+        [res,cost]=nlcg_multiband(res,params);
+    end
     
     % Descale data
     res=res*(1/dscale);
