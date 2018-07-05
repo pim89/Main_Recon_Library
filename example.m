@@ -301,7 +301,7 @@ F2D=FG2D(traj,kdim);
 lowres=F2D'*bsxfun(@times,kspace_data,dcf);
 csm=openadapt(lowres);
 
-%Initialize structure to send to the solverreader_reconframe_lab_raw
+%Initialize structure to send to the solver
 par.kdim=c12d([kdim(1:2) 1 kdim(4)]);
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=1;
@@ -357,8 +357,8 @@ compressed_sense=configure_compressed_sense(par);
 figure,imshow3(abs(compressed_sense(:,:,5:28,1,1)),[],[4 6])
 
 %% View sharing operation, can be in any dimensions
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
+[kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1,1);
+%[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 %kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);

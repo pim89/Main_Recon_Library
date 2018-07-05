@@ -1,4 +1,4 @@
-function [dvf, f_img] = optical_flow(data,alpha,ref)
+function [dvf, f_img] = optical_flow(data,alpha,ref,varargin)
 % Perform image registration on a 2D+time matrix with spatial regularization parameter alpha
 id_registration_method = 1;
 dimx=size(data,1);
@@ -7,6 +7,10 @@ dimz=size(data,3);
 no_dyn=size(data,4);
 
 % Check input
+if nargin < 4
+    MASK=ones(dimx,dimy,dimz);
+end
+
 if ref > no_dyn
     dvf=[];
     disp('Reference is large then number of dynamics')
@@ -50,7 +54,7 @@ nb_raffinement_level   = 1;
 
 %%========================= Adjustement of grey level intensities =========================
 
-magnitude = data;
+magnitude = abs(data);
 
 %% Get the reference image for the registration
 Iref = magnitude(:, :, :, reference_dynamic);
@@ -71,7 +75,7 @@ RTTrackerWrapper(dimx, dimy, dimz, ...
 		 id_registration_method, ...
 		 nb_raffinement_level, ...
 		 accelerationFactor, ...
-		 alpha, beta);  
+		 alpha);  
 
 %%========================= Registration loop over the dynamically acquired images ======
 
@@ -84,13 +88,13 @@ for dyn = 1:no_dyn
   RTTrackerWrapper(Iref, I);
   
   % Apply the estimated motion on the current image
-  f_img(:,:,:,dyn) = RTTrackerWrapper(I);
+  registered_image(:,:,:,dyn) = RTTrackerWrapper(I);
   
   % Get the estimated motion field
-  dvf(:,:,:,:,dyn) = RTTrackerWrapper();
+  dvf(:,:,:,:,dyn)= RTTrackerWrapper();
 
   %% Display registered images & estimated motion field
-  %[u2,v2]=display_result2D(Iref,I,registered_image,pf,MASK);
+  %display_result2D(Iref,I,registered_image(:,:,:,dyn),dvf(:,:,:,:,dyn),MASK);
  
   
 end
