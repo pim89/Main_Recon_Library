@@ -81,7 +81,7 @@ kspace_data(:,:,:,:,:,:,:,:,:,:,:,:,:)=bsxfun(@times,kspace_data(:,:,:,:,:,:,:,:
 kspace_data=fftshift(fft(ifftshift(kspace_data,1),[],1),1);
 cph_post=mean(matrix_to_vec(var(angle(kspace_data(cp,:,:)),[],2)));
 disp('+Radial reconframe phase correction.')
-disp(['     Mean variance of k0 phase changed from: ',num2str(cph_pre),' -> ',num2str(cph_post)
+%disp(['     Mean variance of k0 phase changed from: ',num2str(cph_pre),' -> ',num2str(cph_post)
 
 % END
 end

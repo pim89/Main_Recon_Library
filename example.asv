@@ -540,15 +540,16 @@ par.wavelet=0.005;
 par.mask=mask;
 par.Niter=100;
 
-par.kspace_data=bsxfun(@times,kspace_data,mask);
-kdim=c12d(size(par.kspace_data));
+for z=1:kdim(3)
+    par.kspace_data=bsxfun(@times,kspace_data,mask);
+    kdim=c12d(size(par.kspace_data));
+    
+    % Estimate csm 
+    lr=5; 
+    zero_filled_kspace_data=cartesian_lowres_mask
+    lowres=bart('fft -i
+    par.csm=espirit(lowres,'bart');
 
-% Estimate csm 
-lr=5; 
-mask=cartesian_lowres_mask(kdim,lr);
-lowres=bart('fft -i
-par.csm=espirit(lowres,'bart');
-
-% Iterative reconstructions
-compressed_sense=configure_compressed_sense(par,'bart');   
-
+    % Iterative reconstructions
+    compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
+end
