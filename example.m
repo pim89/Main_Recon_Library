@@ -525,28 +525,25 @@ end
 
 %% Provide support for Cartesian iterative reconstructions -- WIP
 % Generate Cartesian multi-channel kspace-data
-image=bart('phantom -s 4 -k -x 128 -3');
-kdim=c12d(size(kspace_data));
+kspace_data=bart('phantom -s 4 -k -x 128 -3');
 
 % Create an undersampling mask
-mask=bart('poisson -Y 128 -Z 128 -y 3 -z 3 -C 25');
+mask=bart('poisson -Y 128 -Z 128 -y 2 -z 2 -C 25');
 
 % 3D Fourier transform 
-kspace_data=bart('fft -i 7',image);
+kdim=c12d(size(kspace_data));
 
 % Setup iterative reconstruction struct
-par.TV=[0.001 0.001 0 0 0]; % lambdas in dimensions 
-par.wavelet=0.005;
-par.mask=mask;
-par.Niter=100;
+par.wavelet=0.02;
+par.Niter=50;
 
 par.kspace_data=bsxfun(@times,kspace_data,mask);
 kdim=c12d(size(par.kspace_data));
 
 % Estimate csm 
 lr=5; 
-mask=cartesian_lowres_mask(kdim,lr);
-lowres=bart('fft -i
+lr_mask=cartesian_lowres_mask(kdim,lr);
+lowres=bart('fft -i 7',bsxfun(@times,lr_mask,par.kspace_data));
 par.csm=espirit(lowres,'bart');
 
 % Iterative reconstructions
