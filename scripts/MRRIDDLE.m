@@ -78,7 +78,7 @@ m.mrriddle_csm=complex(zeros(ceil(max(traj(:))),ceil(max(traj(:))),kdim(3),kdim(
 disp(['Created instances in: ',outpath,'to for low memory handling.'])
 
 % Some work that can be pre-calculated
-kdim=size(MR.Data);
+kdim=c12d(size(MR.Data));
 lr=3; % 3 times lower resolution for csm estimation
 mask_csm=radial_lowres_mask(kdim(1:2),lr);
 F2D_CSM=FG2D(traj,[kdim(1:2) 1 kdim(4)]);

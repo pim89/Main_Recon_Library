@@ -20,7 +20,14 @@ if strcmpi('amplitude',par.sort_data);
 %     kdata_sort = kdata(:,index,:,:);
 elseif strcmpi('phase',par.sort_data);
     %fprintf('Performing phase binning \n');
-    [maxtab,mintab] = peakdet(par.respiration,0.1);
+    maxtab=[];
+    mintab=[];
+    thresh=.1;
+    while isempty(maxtab)
+     [maxtab,mintab] = peakdet(par.respiration,thresh);
+     thresh=thresh*.75;
+    end
+    
     %plot(par.respiration); hold on;
     %plot(maxtab(:,1),maxtab(:,2),'.','MarkerSize',20);
     %plot(mintab(:,1),mintab(:,2),'.','MarkerSize',20);

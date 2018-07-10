@@ -7,7 +7,6 @@ if coil_comp > 0
     MR.Parameter.Recon.ArrayCompression='yes';
     MR.Parameter.Recon.ACNrVirtualChannels=coil_comp;
 end
-MR.Parameter.Parameter2Read.ky=(0:500)';
 
 % Read data and corrections
 MR.ReadData;
