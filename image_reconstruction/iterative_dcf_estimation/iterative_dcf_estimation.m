@@ -31,5 +31,7 @@ for p=1:prod(kdim(5:end)) % Loop over partitions
     dcf(:,:,:,p)=sdc3_MAT(traj(:,:,:,:,p),n_iter,max(idim),0);
 end
 
+disp('+Density compensation function iteratively estimated.')
+
 % END
 end

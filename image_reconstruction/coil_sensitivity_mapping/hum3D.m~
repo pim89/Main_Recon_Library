@@ -28,14 +28,14 @@ x = [x1d y1d z1d];
 % Get a 4th order polynomial model.
 % CHANGE THE ORDER HERE IF YOU WANT TO.
 %--------------------------------------------------------
-polynomialOrder = 6;
+polynomialOrder = 4;
 p = polyfitn(x, img_small(:), polynomialOrder);
 
 % Evaluate on a grid and plot:
 zg = polyvaln(p, x);
 bias = demax(imresize(reshape(zg, dim(1:3)),[size(img,1) size(img,2)]));
-bias(bias < .4 )=.4; % Limit correction factor to ~2.5
-%bias(bias==0)=mean(nonzeros(bias(:)));
+bias(bias < .01 )=0;
+bias(bias==0)=mean(nonzeros(bias(:)));
 
 img_filt=mask.*(img./bias);
 

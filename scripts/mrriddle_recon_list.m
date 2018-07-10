@@ -8,8 +8,9 @@ datapath5='/local_scratch2/tbruijne/MRRIDDLE_RECONSTRUCTIONS/ABDOMEN/BNOSPIR1/ut
 datapath6='/local_scratch2/tbruijne/MRRIDDLE_RECONSTRUCTIONS/ABDOMEN/T1SPIR3/ut_26092017_1515142_9_2_wipt4dt1tfespirclearV4.raw'; % T1SPIR3
 datapath7='/local_scratch2/tbruijne/MRRIDDLE_RECONSTRUCTIONS/ABDOMEN/BSPIR3/ut_26092017_1523044_10_2_wipt4dbtfedcespirclearV4.raw'; % BSPIR3
 %datapath8='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/rn_02052018_1750319_9_2_wip_radial_btfe_spairV4.raw'; % BSPAIR Pelvis
-for n=0:7
-    MRRIDDLE(eval(['datapath',num2str(n)]),[],5);
+datapath9='/local_scratch2/tbruijne/MRRIDDLE_RECONSTRUCTIONS/PANCREAS/VOLUNTEER_CORSET_ROBIN/RECONFRAME/20_09072018_1402454_4_2_wip_t1_3d_tfe_playV4.lab';
+for n=9
+    MRRIDDLE(eval(['datapath',num2str(n)]),[],10);
 end
 
 %% UTE stack-of-stars
