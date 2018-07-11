@@ -19,7 +19,7 @@ x=x0;
 clear x0 % saves memory
 
 % line search parameters
-maxlsiter=3;
+maxlsiter=6;
 gradToll=1e-8;
 alpha=0.01;  
 beta=params.beta;

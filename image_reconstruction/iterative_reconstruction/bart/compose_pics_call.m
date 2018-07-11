@@ -1,7 +1,7 @@
 function pics_call = compose_pics_call(par)
 %% Function to compose the pics call
 
-pics_call='pics -l1 -S -d5   ';
+pics_call='pics -S -d5 -l1  -m ';
 
 % Wavelet regularization
 if isfield(par,'wavelet')
@@ -14,8 +14,18 @@ if isfield(par,'TV')
     tv_idx=find(dim_reconframe_to_bart(par.TV)>0);
     bm=@(x)(sum(2.^x));
    
-    pics_call=strcat(pics_call,[' -RT:',num2str(bm(tv_idx-1)),':0:',...
+    pics_call=strcat(pics_call,[' -l1 -RT:',num2str(bm(tv_idx-1)),':0:',...
         num2str(max(par.TV))]);
+end
+
+% Locally low rank regularization
+if isfield(par,'LR')
+    % Create bitmask depending on the dimensions
+    tv_idx=find(dim_reconframe_to_bart(par.LR)>0);
+    bm=@(x)(sum(2.^x));
+   
+    pics_call=strcat(pics_call,[' -RL:','7',':0:',...
+        num2str(max(par.LR))]);
 end
 
 % Change number of iterations

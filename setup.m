@@ -7,6 +7,7 @@ if ispc
     addpath(genpath('C:\cygwin64\home\tombruijnen\BART\'))
     addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\RECON_MAIN\Main_Recon_Library\'));
     addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\MRecon-3.0.541')); 
+
     addpath(fullfile('C:\cygwin64\home\tombruijnen\BART\','matlab'));
     setenv('TOOLBOX_PATH','C:\cygwin64\home\tombruijnen\BART\');
     fin_mode=0; % FINUFFT does not work for windows

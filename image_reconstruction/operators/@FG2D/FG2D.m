@@ -30,13 +30,13 @@ fg.kdim=kdim;
 fg.k=reshape(k,[3 kdim(1)*kdim(2) 1 1 1 kdim(5:12)]);clear k 
 
 % Input for nufft_init
-Jd=[4,4];     % Kernel width of convolution
+Jd=[6,6];     % Kernel width of convolution
 Nd=fg.idim(1:2);
-Gd=[Nd*1];    % Overgridding ratio
+Gd=[Nd*1.5];    % Overgridding ratio
 n_shift=Nd/2;
 
 % Normalize k-space coords
-fg.k=fg.k/max(abs(fg.k(:)));
+fg.k=1.1*fg.k/max(abs(fg.k(:)));
 
 % Create a seperate struct for all the dimensions that need seperate trajectories
 for avg=1:kdim(12) % Averages
