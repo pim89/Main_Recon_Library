@@ -1,6 +1,14 @@
-function MR = reconframe_read_sort_correct(MR,type)
+function MR = reconframe_read_sort_correct(MR,type,coil_comp)
 %% Simple reconframe reader
 MR.Parameter.Parameter2Read.typ=type;
+
+% Coil compression
+if coil_comp > 0
+    MR.Parameter.Recon.ArrayCompression='yes';
+    MR.Parameter.Recon.ACNrVirtualChannels=coil_comp;
+end
+
+% Read data and corrections
 MR.ReadData;
 disp('+Read raw data.')
 MR.RandomPhaseCorrection;

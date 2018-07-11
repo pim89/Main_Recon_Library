@@ -198,7 +198,8 @@ if bNoise
     maxN  = log2(realmax('double'));    % realmax('double') = 2^1024
     normR = norm(R);
     
-    while  res > 2*eps  &&  n < maxN
+    %while  res > 2*eps  &&  n < maxN
+    while  res > 5 * eps  &&  n < maxN
         n = n + 1;
         L = 2^n;
         Rtry = (R + L*normR*eieiei)./(1+L);

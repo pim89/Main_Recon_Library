@@ -39,9 +39,9 @@ if isfield(par,'traj')
 end
 
 % Add mask for cartesian only! 
-if isfield(par,'mask')
-    pics_call=strcat(pics_call,' -p');
-end
+% if isfield(par,'mask')
+%     pics_call=strcat(pics_call,' -p');
+% end
 
 % END
 end

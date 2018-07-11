@@ -16,17 +16,25 @@ figure
 for j=1:size(img,3);
     imshow(img(:,:,j),clips,'InitialMagnification',300);
     if counter
-        annotation('textbox',[0.02 0.12 1 0],'string',['t: ',num2str(varargin{1}(j),'%d'),' s'],...
-            'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
+        annotation('textbox',[0.02 0.12 1 0],'string',['T: ',num2str(varargin{1}(j),'%d'),' s'],...
+            'Color','w','FontSize',40,'FontWeight','bold','LineStyle','none');
         
         if numel(varargin)>1
-            annotation('textbox',[0.6 0.12 1 0],'string',['r: ',num2str(varargin{2}(j),'%.1f'),' mm'],...
-                'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
+            annotation('textbox',[0.6 0.12 1 0],'string',['R: ',num2str(varargin{2}(j),'%.1f'),' mm'],...
+                'Color','w','FontSize',40,'FontWeight','bold','LineStyle','none');
         end
     end
 
+%     if mod(j,2) == 0
+%         annotation('textbox',[0.6 0.12 1 0],'string','ACC-SS',...
+%                 'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
+%     else
+%         annotation('textbox',[0.6 0.12 1 0],'string','ACC',...
+%                 'Color','w','FontSize',34,'FontWeight','bold','LineStyle','none');
+%     end
+    
     set(gcf,'Color','k');
-    pause(.1);
+    pause(1);
     A = getframe();
     im=frame2im(A);
     [A,map]=rgb2ind(im,256);

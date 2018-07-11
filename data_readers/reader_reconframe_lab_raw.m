@@ -7,7 +7,16 @@ function [kspace_data,MR] = reader_reconframe_lab_raw(loc,varargin)
 
 % Process data type
 curdir=get_data_dir(loc);
-if isempty(varargin)
+
+% Coil compression input
+if nargin < 3
+    coil_comp=0;
+else
+    coil_comp=varargin{2};
+end
+
+% Data type input
+if nargin < 2
     type=1;
 else
     type=varargin{1};
@@ -15,7 +24,7 @@ end
 
 % Read data
 MR=MRecon(loc);
-MR=reconframe_read_sort_correct(MR,type);
+MR=reconframe_read_sort_correct(MR,type,coil_comp);
 kspace_data=MR.Data;
 
 end

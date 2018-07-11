@@ -1,9 +1,9 @@
 %% Demonstration script
 % Note: for windows replace all "/" with "/" and vice versa.
-clear all;close all;clc
-datapath1='/local_scratch2/tbruijne/WorkingData/4DGA/Scan2/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
-datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
-datapath3='/home/tbruijne/Documents/Data/SOS_GA_LUNG/ha_27112017_1534304_8_2_wip_t_t1_4d_tfeV4.raw';
+clear all;close all;clc;setup
+%datapath1='/local_scratch2/tbruijne/WorkingData/4DGA/Scan2/bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw'; % Golden angle stack-of-stars
+datapath1='C:\Users\tombruijnen\Documents\Programming\MATLAB\RECON_MAIN\Data\SOS_GA\bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw';
+%datapath2='/nfs/bsc01/researchData/USER/tbruijne/MR_Data/Internal_data/Radial3D_data/U2/20170926_3D_Abdomen/Scan1/ut_26092017_1534464_12_2_wipt3dgameuteclearV4.raw'; % Golden angle stack-of-stars ute
 
 %% Readers & Writers
 % Get k-space data from lab/raw
@@ -49,9 +49,15 @@ Greengard2D=G2D'*(bsxfun(@times,MR.Data,dcf));
 figure,imshow3(abs(Greengard2D(:,:,5:28,1)),[],[4 6])
 
 % Do the Flat Iron gridding
-FF2D=FI2D(traj,kdim);
-FlatIron2D=FF2D'*(bsxfun(@times,MR.Data,dcf));
-figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
+if fin_mode % Doesnt compile for windows at the moment
+    FF2D=FI2D(traj,kdim);
+    FlatIron2D=FF2D'*(bsxfun(@times,MR.Data,dcf));
+    figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
+end
+
+% Do the BART gridding
+B2D=BG2D(traj,kdim);
+BART2D=B2D'*(bsxfun(@times,MR.Data,dcf));
 
 %% NUFFT toolboxes 3D
 [~,MR]=reader_reconframe_lab_raw(datapath1);
@@ -77,11 +83,13 @@ end
 figure,imshow3(abs(Greengard3D(:,:,5:28,1)),[],[4 6])
 
 % 3D FlatIron grdding
-FF3D=FI3D(traj,[kdim(1:3) 1]);
-for c=1:1%size(MR.Data,4)
-    FlatIron3D(:,:,:,c)=FF3D'*(MR.Data(:,:,:,c).*dcf);
+if fin_mode % Doesnt compile for windows at the moment
+    FF3D=FI3D(traj,[kdim(1:3) 1]);
+    for c=1:1%size(MR.Data,4)
+        FlatIron3D(:,:,:,c)=FF3D'*(MR.Data(:,:,:,c).*dcf);
+    end
+    figure,imshow3(abs(FlatIron3D(:,:,5:28,1)),[],[4 6])
 end
-figure,imshow3(abs(FlatIron3D(:,:,5:28,1)),[],[4 6])
 
 %% Coil sensitivity map estimation (espirit and openadapt)
 [~,MR]=reader_reconframe_lab_raw(datapath1);
@@ -301,7 +309,7 @@ F2D=FG2D(traj,kdim);
 lowres=F2D'*bsxfun(@times,kspace_data,dcf);
 csm=openadapt(lowres);
 
-%Initialize structure to send to the solverreader_reconframe_lab_raw
+%Initialize structure to send to the solver
 par.kdim=c12d([kdim(1:2) 1 kdim(4)]);
 par.idim=idim_from_trajectory(traj,par.kdim);
 par.Niter=1;
@@ -313,7 +321,7 @@ par.beta=.2; % step-size of CG
 for z=15:15%1:size(kspace_data,3)
     par.y=par.W*kspace_data(:,:,z,:,:,:,:,:,:,:,:);
     par.S=SS(csm(:,:,z,:));  
-    [compressed_sense(:,:,z),~]=configure_compressed_sense(par);   
+    compressed_sense(:,:,z)=configure_compressed_sense(par);   
 end
 
 %% Real-time 3D L1 TV compressed sense -- matlab implementation
@@ -358,7 +366,7 @@ figure,imshow3(abs(compressed_sense(:,:,5:28,1,1)),[],[4 6])
 
 %% View sharing operation, can be in any dimensions
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
-[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
+%[noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
 %kspace_data=noise_prewhitening(kspace_data,noise_data);
 kdim=size(kspace_data);
 traj=radial_trajectory(kdim(1:2),1);
@@ -390,32 +398,33 @@ end
 close all;slicer(squeeze(img))
 
 %% Load gradient impulse response function and process a UTE acquisition
-[kspace_data,MR]=reader_reconframe_lab_raw(datapath2);
-kspace_data=kspace_data{1};
-ppe_pars=reader_reconframe_ppe_pars(MR);
-kdim=size(kspace_data);
-pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_u2.mat';
+if ute
+    [kspace_data,MR]=reader_reconframe_lab_raw(datapath2);
+    kspace_data=kspace_data{1};
+    ppe_pars=reader_reconframe_ppe_pars(MR);
+    kdim=size(kspace_data);
+    pathgirf='/nfs/bsc01/researchData/USER/tbruijne/Projects_Software/GIRFs/girf_u2.mat';
 
-% Get k-space trajectory per gradient (carefull its in cells)!
-[girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
-girf_k={girf_k{1}};
-girf_phase={girf_phase{1}};
-%girf_k{1}(1:2,:)=girf_k{1}([2 1],:);
+    % Get k-space trajectory per gradient (carefull its in cells)!
+    [girf_k,girf_phase]=GIRF(MR,pathgirf,'verbose');
+    girf_k={girf_k{1}};
+    girf_phase={girf_phase{1}};
+    %girf_k{1}(1:2,:)=girf_k{1}([2 1],:);
 
-% Change to k-space trajectory for the experiment
-traj=ute_trajectory_girf(kdim(1:3),1,girf_k);
-dcf=iterative_dcf_estimation(traj);
+    % Change to k-space trajectory for the experiment
+    traj=ute_trajectory_girf(kdim(1:3),1,girf_k);
+    dcf=iterative_dcf_estimation(traj);
 
-% GIRF phase correction
-kspace_data=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
+    % GIRF phase correction
+    kspace_data=radial_phase_correction_girf(kspace_data,1,kdim(1:2),girf_phase);
 
-% Normal stuff
-kspace_data=ifft(kspace_data,[],3);
-F2D=FG2D(traj(:,:,:,16),kdim);
-img=F2D'*bsxfun(@times,kspace_data,dcf);
-img=sum(abs(img),4);
-close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
-
+    % Normal stuff
+    kspace_data=ifft(kspace_data,[],3);
+    F2D=FG2D(traj(:,:,:,16),kdim);
+    img=F2D'*bsxfun(@times,kspace_data,dcf);
+    img=sum(abs(img),4);
+    close all;slicer(flip(flip(squeeze(img),3),1),[1 1 2])
+end
 %% Coil compression using BART
 [kspace_data,MR]=reader_reconframe_lab_raw(datapath1,1);
 [noise_data,~]=reader_reconframe_lab_raw(datapath1,5);
@@ -458,9 +467,9 @@ kspace_data=ifft(kspace_data,[],3);
 kspace_data=radial_phase_correction_zero(kspace_data); 
 
 % Coil compression
-% nCh=6;
-% kspace_data=coil_compression(kspace_data,nCh);
-% kdim=c12d(size(kspace_data));
+nCh=6;
+kspace_data=coil_compression(kspace_data,nCh);
+kdim=c12d(size(kspace_data));
 
 % Estimate csm
 lr=5; % 5 times lower resolution
@@ -521,30 +530,54 @@ end
 %% Provide support for Cartesian iterative reconstructions -- WIP
 % Generate Cartesian multi-channel kspace-data
 kspace_data=bart('phantom -s 4 -k -x 128 -3');
-kdim=c12d(size(kspace_data));
 
 % Create an undersampling mask
-mask=bart('poisson -Y 128 -Z 128 -y 3 -z 3 -C 25');
+mask=bart('poisson -Y 128 -Z 128 -y 2 -z 2 -C 25');
 
-% Fourier transform along readout
-kspace_data=bart('fft -i 7',kspace_data);
+% 3D Fourier transform 
+kdim=c12d(size(kspace_data));
 
 % Setup iterative reconstruction struct
-par.TV=[0.001 0.001 0 0 0.01]; % lambdas in dimensions 
-par.wavelet=0.005;
-par.mask=mask;
-par.Niter=100;
+par.wavelet=0.02;
+par.Niter=50;
 
-% for z=1:kdim(3)
-%     par.kspace_data=kspace_data(z,:,:,:,:);
-%     kdim=c12d(size(par.kspace_data));
-%     
-%     % Estimate csm 
-%     lr=5; 
-%     zero_filled_kspace_data=cartesian_lowres_mask
-%     lowres=bart('fft -i
-%     par.csm=espirit(lowres,'bart');
-% 
-%     % Iterative reconstructions
-%     compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
-% end
+par.kspace_data=bsxfun(@times,kspace_data,mask);
+kdim=c12d(size(par.kspace_data));
+
+% Estimate csm 
+lr=5; 
+lr_mask=cartesian_lowres_mask(kdim,lr);
+lowres=bart('fft -i 7',bsxfun(@times,lr_mask,par.kspace_data));
+par.csm=espirit(lowres,'bart');
+
+% Iterative reconstructions
+compressed_sense=configure_compressed_sense(par,'bart');   
+
+%% GROG interpolation
+addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\GROG\master'))
+datapath1='C:\Users\tombruijnen\Documents\Programming\MATLAB\RECON_MAIN\Data\SOS_GA\bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw';
+[~,MR]=reader_reconframe_lab_raw(datapath1);
+kdim=size(MR.Data);
+ppe_pars=reader_reconframe_ppe_pars(MR);
+
+% Trajectory & density
+traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
+dcf=radial_density(traj);
+
+% FFT in z
+MR.Data=ifft(MR.Data,[],3);
+
+% Radial phase correction
+MR.Data=radial_phase_correction_zero(MR.Data);
+
+% GROG operation
+GROG_data=GROG_kdata(MR.Data,traj);
+
+% 2D FFT
+GROG_data=fftshift(fftshift(GROG_data,1),2);
+mask=logical(abs(GROG_data(:,:,:,1)));
+fft2d=demax(flip(crop(sqrt(sum(abs(fftshift(fftshift(ifft2(GROG_data),1),2)).^2,4)),kdim(1)/2),1));
+    
+% 2D Nufft operator
+F2D=FG2D(traj,kdim);
+nufft=demax(flip(sqrt(sum(abs(F2D'*(bsxfun(@times,MR.Data,dcf))).^2,4)),1));

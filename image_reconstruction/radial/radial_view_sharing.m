@@ -62,5 +62,7 @@ end
 % Index everything
 res=cat(dim(2),fin{1:end});
 
+disp(['+Data is view-shared to dimensions: ',num2str(size(res))])
+
 % END
 end
