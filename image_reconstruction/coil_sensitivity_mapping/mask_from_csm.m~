@@ -7,25 +7,15 @@ nn=5;
 % Make csm smaller for faster computing
 csm=imresize(csm,[100 100]);
 dim=size(csm);
-if dim(3) == 1
-    kern=ones(nn,nn);
-else
-    z=makeuneven(floor(dim(3)/10));
-    if z<1
-        z=1;
-    end
-    kern=ones(nn,nn,z);
-end
+kern=ones(nn,nn);
 
 for c=1:dim(4)
-   mask(:,:,:,c)=stdfilt(abs(csm(:,:,:,c)),kern);
+    for z=1:dim(3)
+        mask(:,:,z,c)=stdfilt(angle(csm(:,:,z,c)),kern);
+    end
 end
 
-if dim(3)==1
-    mask=imgaussfilt(1-demax(sum(mask,4)),0.1*size(csm,1));
-else
-    mask=imgaussfilt3(1-demax(sum(mask,4)),0.1*size(csm,1));
-end
+mask=median(mask,4);
 
 th=graythresh(mask);
 mask(mask<th)=0;
@@ -45,13 +35,25 @@ end
 
 mask=zeros(size(mask));
 mask(CC.PixelIdxList{n_list})=1;
-mask=imresize(mask,dim_full(1:2));
 
 if dim(3)==1
-    mask=imgaussfilt(1-demax(sum(mask,4)),0.1*size(csm,1));
+    [x,y,z]=ndgrid(-5:5);
+    se=strel(sqrt(x.^2 + y.^2 + z.^2) <=8);
+    mask=imdilate(mask,se);
+
+
 else
-    mask=imgaussfilt3(1-demax(sum(mask,4)),0.1*size(csm,1));
+    [x,y]=ndgrid(-5:5);
+    se=strel(sqrt(x.^2 + y.^2) <=8);
+    mask=imdilate(mask,se);
+
 end
+
+
+mask=imresize(mask,dim_full(1:2));
+th=graythresh(mask);
+mask(mask<th)=0;
+mask(mask>0)=1;
 
 % END
 end
