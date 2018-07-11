@@ -527,7 +527,7 @@ for z=15:15%1:size(kspace_data,3)
     compressed_sense(:,:,z,:,:)=configure_compressed_sense(par,'bart');   
 end
 
-%% Provide support for Cartesian iterative reconstructions -- WIP
+%% Provide support for Cartesian iterative reconstructions 
 % Generate Cartesian multi-channel kspace-data
 kspace_data=bart('phantom -s 4 -k -x 128 -3');
 
@@ -581,3 +581,5 @@ fft2d=demax(flip(crop(sqrt(sum(abs(fftshift(fftshift(ifft2(GROG_data),1),2)).^2,
 % 2D Nufft operator
 F2D=FG2D(traj,kdim);
 nufft=demax(flip(sqrt(sum(abs(F2D'*(bsxfun(@times,MR.Data,dcf))).^2,4)),1));
+
+%% Multiband - reconstruction

@@ -7,13 +7,13 @@
 close all
 % Sequence settings
 N=256; % Matrix size
-nspokes=round(.5*N*pi/2); % Nyquist
+nspokes=round(N*pi/2); % Nyquist
 dynamics=10; % number of dynamics
 goldenangle=1; % Golden angle number [1-7]
 
 % Image space
 load('brain.mat');
-I=cat(3,phantom(N),imresize(im,[N N]));
+I=cat(3,phantom(N),demax(imresize(im,[N N])));
 
 % K-space trajectory & density
 kdim=c12d([2*N nspokes 2]); %[kx ky kz coils dynamics ...]
@@ -49,7 +49,7 @@ op.kdim=kdim;
 op.idim=idim_from_trajectory(traj,op.kdim);
 op.idim(3)=2;
 op.Niter=15;
-op.TV=TV_sparse(op.idim,[1 1 0 0 1],maxval*[0.00 0.00 0 0 0.02]);
+op.TV=TV_sparse(op.idim,[1 1 0 0 1],maxval*[0.0001 0.0001 0 0 0.05]);
 op.S=SS(ones(op.idim(1:3)));
 op.beta=.6; % step-size of CG
 op.y=op.W*kspace_data;

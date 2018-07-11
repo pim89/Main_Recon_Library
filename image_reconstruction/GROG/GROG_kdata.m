@@ -9,11 +9,13 @@ kdim=size(kdata);
 %interp_method       = para.interp_method;
 
 %%%%% pre-interpolation
-disp('Pre-interpolate into Cartesian space per 2D slice...')
+disp('+Pre-interpolate into Cartesian space per 2D slice...')
 
+for dyn=1:kdim(5)
 for z=1:kdim(3)
-    G=GROG.init(kdata(:,:,z,:),squeeze(traj(1,:,:,:,:)),squeeze(traj(2,:,:,:,:)));
-    kdata_GROG(:,:,z,:)=GROG.interp(kdata(:,:,z,:),G);
+    G=GROG_init(kdata(:,:,z,:,dyn),squeeze(traj(1,:,:,:,dyn)),squeeze(traj(2,:,:,:,dyn)));
+    kdata_GROG(:,:,z,:,dyn)=GROG_interp(kdata(:,:,z,:,dyn),G);
+end
 end
 
 % END
