@@ -39,6 +39,7 @@ Tested and supported features:
 	BART support in windows
 	Singleton expansion operators for DCF in the example script
 	BART 4D PICS interface
+	BART Cartesian compressed sensing reconstruction
 
 TODO:
 	NUFFT using BART

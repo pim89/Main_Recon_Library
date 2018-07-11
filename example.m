@@ -55,6 +55,10 @@ if fin_mode % Doesnt compile for windows at the moment
     figure,imshow3(abs(FlatIron2D(:,:,5:28,1)),[],[4 6])
 end
 
+% Do the BART gridding
+B2D=BG2D(traj,kdim);
+BART2D=B2D'*(bsxfun(@times,MR.Data,dcf));
+
 %% NUFFT toolboxes 3D
 [~,MR]=reader_reconframe_lab_raw(datapath1);
 kdim=size(MR.Data);
@@ -525,30 +529,55 @@ end
 
 %% Provide support for Cartesian iterative reconstructions -- WIP
 % Generate Cartesian multi-channel kspace-data
-image=bart('phantom -s 4 -k -x 128 -3');
-kdim=c12d(size(kspace_data));
+kspace_data=bart('phantom -s 4 -k -x 128 -3');
 
 % Create an undersampling mask
-mask=bart('poisson -Y 128 -Z 128 -y 3 -z 3 -C 25');
+mask=bart('poisson -Y 128 -Z 128 -y 2 -z 2 -C 25');
 
 % 3D Fourier transform 
-kspace_data=bart('fft -i 7',image);
+kdim=c12d(size(kspace_data));
 
 % Setup iterative reconstruction struct
-par.TV=[0.001 0.001 0 0 0]; % lambdas in dimensions 
-par.wavelet=0.005;
-par.mask=mask;
-par.Niter=100;
+par.wavelet=0.02;
+par.Niter=50;
 
 par.kspace_data=bsxfun(@times,kspace_data,mask);
 kdim=c12d(size(par.kspace_data));
 
 % Estimate csm 
 lr=5; 
-mask=cartesian_lowres_mask(kdim,lr);
-lowres=bart('fft -i
+lr_mask=cartesian_lowres_mask(kdim,lr);
+lowres=bart('fft -i 7',bsxfun(@times,lr_mask,par.kspace_data));
 par.csm=espirit(lowres,'bart');
 
 % Iterative reconstructions
 compressed_sense=configure_compressed_sense(par,'bart');   
 
+%% GROG interpolation
+addpath(genpath('C:\Users\tombruijnen\Documents\Programming\MATLAB\GROG\master'))
+datapath1='C:\Users\tombruijnen\Documents\Programming\MATLAB\RECON_MAIN\Data\SOS_GA\bs_06122016_1607476_2_2_wip4dga1pfnoexperiment1senseV4.raw';
+[~,MR]=reader_reconframe_lab_raw(datapath1);
+kdim=size(MR.Data);
+ppe_pars=reader_reconframe_ppe_pars(MR);
+
+% Trajectory & density
+traj=radial_trajectory(kdim(1:2),ppe_pars.goldenangle);
+dcf=radial_density(traj);
+
+% FFT in z
+MR.Data=ifft(MR.Data,[],3);
+
+% Radial phase correction
+MR.Data=radial_phase_correction_zero(MR.Data);
+
+% GROG operation
+GROG_data=GROG_kdata(MR.Data,traj);
+
+% 2D FFT
+GROG_data=fftshift(fftshift(GROG_data,1),2);
+mask=logical(abs(GROG_data(:,:,:,1)));
+fft2d=demax(flip(crop(sqrt(sum(abs(fftshift(fftshift(ifft2(GROG_data),1),2)).^2,4)),kdim(1)/2),1));
+    
+% 2D Nufft operator
+F2D=FG2D(traj,kdim);
+nufft=demax(flip(sqrt(sum(abs(F2D'*(bsxfun(@times,MR.Data,dcf))).^2,4)),1));
