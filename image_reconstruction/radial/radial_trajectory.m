@@ -44,6 +44,7 @@ else
     end
     
     % Calculate samples for single spoke
+    %kx=linspace(0,2*kdim(1)-1,kdim(1)+1)'-(2*kdim(1)-1)/2;kx(end)=[];
     kx=linspace(0,kdim(1)-1,kdim(1)+1)'-(kdim(1)-1)/2;kx(end)=[];
     
     % Modulate successive spokes
